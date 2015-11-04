@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "required": [ "prefix" ],
+  "properties": {
+    "prefix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "debug": {
+      "type": "boolean"
+    },
+    "amqp": {
+      "type": "object"
+    },
+    "predefinedLimits": {
+      "type": "object"
+    },
+    "postfix_adhoc": {
+      "type": "string",
+      "minLength": 1
+    },
+    "postfix_predefined": {
+      "type": "string",
+      "minLength": 1
+    },
+    "htmlToText": {
+      "type": "object"
+    }
+  }
+}
