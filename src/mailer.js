@@ -17,8 +17,15 @@ const validator = new Validation(path.resolve(__dirname, './schemas'));
 const { validate } = validator;
 const validatorInitPromise = validator.init();
 
+/**
+ * @namespace Mailer
+ */
 module.exports = class Mailer extends EventEmitter {
 
+  /**
+   * Default options that are merged into core
+   * @type {Object}
+   */
   static defaultOpts = {
     debug: process.env.NODE_ENV === 'development',
     postfix_adhoc: process.env.MS_MAILER_ADHOC_POSTFIX || 'adhoc',
@@ -42,6 +49,11 @@ module.exports = class Mailer extends EventEmitter {
     },
   };
 
+  /**
+   * Updates default options and sets up predefined accounts
+   * @param  {Object} opts
+   * @return {Mailer}
+   */
   constructor(opts = {}) {
     super();
     const config = this._config = ld.merge({}, Mailer.defaultOpts, opts);
@@ -74,10 +86,23 @@ module.exports = class Mailer extends EventEmitter {
     });
   }
 
+  /**
+   * Simple debugging logger
+   * @param  {String} namespace
+   * @param  {String} message
+   */
   log = (namespace, message) => {
     process.stdout.write(`${namespace}> ${JSON.stringify(message)}\n`);
   }
 
+  /**
+   * Core router for the messages
+   * @param  {Mixed}    message { account, email }
+   * @param  {Object}   headers
+   * @param  {Object}   actions - not handled at the moment
+   * @param  {Function} next    - response function
+   * @return {Promise}
+   */
   router = (message, headers, actions, next) => {
     const route = headers.routingKey.split('.').pop();
 
@@ -91,6 +116,14 @@ module.exports = class Mailer extends EventEmitter {
     }
   }
 
+  /**
+   * Sends message via a predefined account
+   * @param  {Mixed}    message { account: String, email }
+   * @param  {Object}   headers
+   * @param  {Object}   actions - not handled at the moment
+   * @param  {Function} next    - response function
+   * @return {Promise}
+   */
   predefined(message, headers, actions, next) {
     return validate('predefined', message)
       .return(message.account)
@@ -101,6 +134,14 @@ module.exports = class Mailer extends EventEmitter {
       .asCallback(next);
   }
 
+  /**
+   * Sends message via passed auth params for the account
+   * @param  {Mixed}    message { account: Object, email }
+   * @param  {Object}   headers
+   * @param  {Object}   actions - not handled at the moment
+   * @param  {Function} next    - response function
+   * @return {Promise}
+   */
   adhoc(message, headers, actions, next) {
     return validate('adhoc', message)
       .then(() => {
@@ -112,12 +153,23 @@ module.exports = class Mailer extends EventEmitter {
       .asCallback(next);
   }
 
+  /**
+   * Promise wrapper over smtp transport
+   * @param  {Object} transport
+   * @param  {Object} email
+   * @return {Promise}
+   */
   sendMail = (transport, email) => {
     return Promise.fromNode((next) => {
       transport.sendMail(email, next);
     });
   }
 
+  /**
+   * Returns existing transport for the account
+   * @param  {String} accountName [description]
+   * @return {Promise}
+   */
   getTransport = (accountName) => {
     const transport = this._transports[accountName];
     if (transport) {
@@ -127,6 +179,10 @@ module.exports = class Mailer extends EventEmitter {
     return Promise.reject(new Errors.NotFoundError(`can't find transport for "${accountName}"`));
   }
 
+  /**
+   * Initializes disposable transport
+   * @return {Disposer}
+   */
   initDisposableTransport() {
     return this.initTransport
       .apply(this, arguments)
@@ -135,6 +191,12 @@ module.exports = class Mailer extends EventEmitter {
       });
   }
 
+  /**
+   * Initializes transport with passed credentials
+   * @param  {Object} credentials
+   * @param  {Object} opts
+   * @return {Promise}
+   */
   initTransport(credentials, opts = { maxConnections: 1 }) {
     return validate('credentials', credentials)
       .then(() => {
@@ -163,6 +225,11 @@ module.exports = class Mailer extends EventEmitter {
       });
   }
 
+  /**
+   * Connects to AMQP exchange, makes sure predefined accounts are created
+   * and validation is initialized
+   * @return {Promise}
+   */
   connect() {
     if (this._amqp) {
       return Promise.reject(new Errors.NotPermittedError('service was already started'));
@@ -185,6 +252,10 @@ module.exports = class Mailer extends EventEmitter {
       .return(this);
   }
 
+  /**
+   * Closes connection to AMQP exchange, removes predefined transports
+   * @return {Promise}
+   */
   close() {
     if (!this._amqp) {
       return Promise.reject(new Errors.NotPermittedError('service is not online'));
