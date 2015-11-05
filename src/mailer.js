@@ -54,25 +54,28 @@ module.exports = class Mailer extends EventEmitter {
 
     if (config.debug === true) {
       this.on('log', this.log.bind(this, 'ms-mailer'));
+      this.emit('log', 'configuration', JSON.stringify(config));
     }
 
     // init predefined transports
     const predefinedAccounts = config.accounts || {};
     const accountNames = Object.keys(predefinedAccounts);
-    this._initTransports = Promise.reduce(accountNames, (transports, accountKey) => {
-      return this.initTransport(predefinedAccounts[accountKey], config.predefinedLimits)
-        .then((transport) => {
-          transports[accountKey] = transport;
-          return transports;
-        });
-    }, {})
-    .then((transports) => {
-      this._transports = transports;
+    const transports = this._transports = {};
+
+    this._initTransports = Promise.each(accountNames, (accountKey) => {
+      return this.initTransport(
+        predefinedAccounts[accountKey],
+        config.predefinedLimits
+      )
+      .then((transport) => {
+        transports[accountKey] = transport;
+        this.emit('log', 'accounts', fmt('created transport %s', accountKey));
+      });
     });
   }
 
   log = (namespace, message) => {
-    process.stdout.write(`${namespace}> ${message}\n`);
+    process.stdout.write(`${namespace}> ${JSON.stringify(message)}\n`);
   }
 
   router = (message, headers, actions, next) => {
@@ -84,7 +87,7 @@ module.exports = class Mailer extends EventEmitter {
     case this._config.postfix_adhoc:
       return this.adhoc(message, headers, actions, next);
     default:
-      return next(new Errors.NotImplementedError(fmt('method "%s" is not supported', route)));
+      return next(new Errors.NotImplementedError(fmt('method "%s"', route)));
     }
   }
 
@@ -125,7 +128,8 @@ module.exports = class Mailer extends EventEmitter {
   }
 
   initDisposableTransport() {
-    return this.initTransport.apply(this, arguments)
+    return this.initTransport
+      .apply(this, arguments)
       .disposer(function disposeOfConnection(transport) {
         transport.close();
       });
@@ -165,13 +169,18 @@ module.exports = class Mailer extends EventEmitter {
     }
 
     // once transport is initialized - return instance of self
+    const config = this._config;
     return validatorInitPromise
       .then(() => {
-        return validate('config', this._config);
+        return validate('config', config);
       })
       .then(() => {
-        const amqp = this._amqp = AMQPTransport.connect(this._config.amqp, this.router);
-        return Promise.all([ amqp, this._initTransports ]);
+        return Promise.all([
+          AMQPTransport.connect(config.amqp, this.router).then((amqp) => {
+            this._amqp = amqp;
+          }),
+          this._initTransports,
+        ]);
       })
       .return(this);
   }
@@ -183,14 +192,14 @@ module.exports = class Mailer extends EventEmitter {
 
     return Promise.all([
       this._amqp.close().then(() => {
+        this._amqp.removeListener('log', this.log);
         this._amqp = null;
         this._initTransports = null;
       }),
       Promise.map(Object.keys(this._transports), (email) => {
+        this._transports[email].close();
         delete this._transports[email];
-        return Promise.fromNode((next) => {
-          this._transports[email].close(next);
-        });
+        this.emit('log', 'accounts', fmt('removed transport %s', email));
       }),
     ]);
   }

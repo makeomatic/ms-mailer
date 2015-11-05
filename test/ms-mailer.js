@@ -1,9 +1,24 @@
+const Promise = require('bluebird');
 const chai = require('chai');
 const expect = chai.expect;
 const { SMTPServer } = require('smtp-server');
+const AMQPTransport = require('ms-amqp-transport');
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
   this.timeout(10000);
+
+  const configuration = { connection: {} };
+  if (process.env.TEST_ENV === 'docker') {
+    configuration.connection.host = process.env.RABBITMQ_PORT_5672_TCP_ADDR;
+    configuration.connection.port = process.env.RABBITMQ_PORT_5672_TCP_PORT;
+  }
+
+  function getAMQPConnection() {
+    return AMQPTransport.connect(configuration)
+      .disposer((amqp) => {
+        return amqp.close();
+      });
+  }
 
   const Mailer = require('../src');
   const VALID_PREDEFINED_ACCOUNTS = {
@@ -17,6 +32,12 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       },
     },
   };
+  const TEST_EMAIL = {
+    to: 'v@makeomatic.ru',
+    html: 'very important stuff',
+    from: 'test mailer <v@example.com>',
+  };
+  let mailer;
 
   beforeEach('init ssl service', function startSMTPServer(done) {
     // This example starts a SMTP server using TLS with your own certificate and key
@@ -24,6 +45,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       hideSTARTTLS: true,
       secure: false,
       closeTimeout: 2000,
+      logger: process.env.NODE_ENV === 'development',
       authMethods: ['PLAIN', 'LOGIN', 'XOAUTH2'],
       onAuth: function handleAuth(auth, session, callback) {
         switch (auth.method) {
@@ -43,78 +65,111 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     this.server.listen(8465, '0.0.0.0', done);
   });
 
-  it('successfully starts mailer', () => {
-    this.mailer = new Mailer();
-    return this.mailer.connect();
+  it('successfully starts mailer', function test() {
+    mailer = new Mailer({ amqp: configuration });
+    return mailer.connect();
   });
 
-  it('fails to start mailer on invalid configuration', () => {
-    this.mailer = new Mailer({
+  it('fails to start mailer on invalid configuration', function test() {
+    mailer = new Mailer({
       prefix: false,
+      amqp: configuration,
     });
-    return this.mailer.connect()
+    return mailer.connect()
       .catchReturn({ name: 'ValidationError' }, true);
   });
 
-  it('is able to setup transports for a predefined account', () => {
-    this.mailer = new Mailer({
+  it('is able to setup transports for a predefined account', function test() {
+    mailer = new Mailer({
       accounts: VALID_PREDEFINED_ACCOUNTS,
+      amqp: configuration,
     });
-    return this.mailer.connect().then(() => {
-      expect(this.mailer._transports).to.have.ownProperty('test-example');
-    });
-  });
 
-  it('is able to send a message via predefined account', () => {
-    this.mailer = new Mailer({
-      accounts: VALID_PREDEFINED_ACCOUNTS,
-    });
-    return this.mailer
+    return mailer
       .connect()
       .then(() => {
-        return this.mailer.router(
+        expect(mailer._transports).to.have.ownProperty('test-example');
+      });
+  });
+
+  it('is able to send a message via predefined account', function test() {
+    mailer = new Mailer({
+      accounts: VALID_PREDEFINED_ACCOUNTS,
+      amqp: configuration,
+    });
+    return mailer.connect()
+      .then(() => {
+        return mailer.router(
           {
             account: 'test-example',
-            email: {
-              to: 'v@makeomatic.ru',
-              html: 'very important stuff',
-              from: 'test mailer <v@makeomatic.ru>',
-            },
+            email: TEST_EMAIL,
           },
           {
             routingKey: 'predefined',
           }
         );
+      })
+      .then((msg) => {
+        expect(msg.response).to.be.eq('250 OK: message queued');
       });
   });
 
-  it('is able to send a message via adhoc account', () => {
-    this.mailer = new Mailer({
-      accounts: VALID_PREDEFINED_ACCOUNTS,
-    });
-    return this.mailer
+  it('is able to send a message via adhoc account', function test() {
+    mailer = new Mailer({ amqp: configuration });
+    return mailer
       .connect()
       .then(() => {
-        return this.mailer.router(
+        return mailer.router(
           {
             account: VALID_PREDEFINED_ACCOUNTS['test-example'],
-            email: {
-              to: 'v@makeomatic.ru',
-              html: 'very important stuff',
-              from: 'test mailer <v@makeomatic.ru>',
-            },
+            email: TEST_EMAIL,
           },
           {
             routingKey: 'adhoc',
           }
         );
+      })
+      .then((msg) => {
+        expect(msg.response).to.be.eq('250 OK: message queued');
       });
   });
 
-  afterEach('closes mailer', function stopMailer() {
-    return this.mailer && this.mailer.close().then(() => {
-      this.mailer = null;
+  it('is able to send a message via amqp/predefined', function test() {
+    mailer = new Mailer({
+      accounts: VALID_PREDEFINED_ACCOUNTS,
+      amqp: configuration,
     });
+    return mailer.connect().then(() => {
+      return Promise.using(getAMQPConnection(), (amqp) => {
+        return amqp.publishAndWait('mailer.predefined', {
+          account: 'test-example',
+          email: TEST_EMAIL,
+        });
+      })
+      .then((msg) => {
+        expect(msg.response).to.be.eq('250 OK: message queued');
+      });
+    });
+  });
+
+  it('is able to send a message via amqp/adhoc', function test() {
+    mailer = new Mailer({ amqp: configuration });
+    return mailer.connect().then(() => {
+      return Promise.using(getAMQPConnection(), (amqp) => {
+        return amqp.publishAndWait('mailer.adhoc', {
+          account: VALID_PREDEFINED_ACCOUNTS['test-example'],
+          email: TEST_EMAIL,
+        });
+      })
+      .then((msg) => {
+        expect(msg.response).to.be.eq('250 OK: message queued');
+      });
+    });
+  });
+
+  afterEach('closes mailer', function closesMailer() {
+    return mailer.close()
+      .catchReturn({ name: 'NotPermittedError' }, true);
   });
 
   afterEach('close smtp service', function stopSMTPServer(done) {
