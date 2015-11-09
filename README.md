@@ -18,8 +18,8 @@ const AMQP = require('ms-amqp-transport');
 
 const mailer = new Mailer({
   debug: Boolean,
-  postfix_adhoc: String,
-  postfix_predefined: String,
+  postfixAdhoc: String,
+  postfixPredefined: String,
   prefix: String,
   predefinedLimits: {
     maxConnections: Number,
@@ -69,8 +69,8 @@ Promise.props({ mailer: mailerReady, amqp: AMQP.connect() })
 
 1. `debug` - boolean, whether to print log messages or not
 2. `prefix` - which route prefix to bind to, defaults to `mailer`
-3. `postfix_adhoc` -  which suffix to use for adhoc messaging
-4. `postfix_predefined` - which suffix to use for predefined accounts messaging
+3. `postfixAdhoc` -  which suffix to use for adhoc messaging
+4. `postfixPredefined` - which suffix to use for predefined accounts messaging
 5. `predefinedLimits` - which opts to pass to smtp transport constructor for predefined accounts, consult nodemailer-smtp-transport
 6. `amqp` - options that are passed to `ms-amqp-transport`
 7. `htmlToText` - html to text conversion options for nodemailer
