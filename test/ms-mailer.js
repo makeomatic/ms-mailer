@@ -45,7 +45,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       hideSTARTTLS: true,
       secure: false,
       closeTimeout: 2000,
-      logger: process.env.NODE_ENV === 'development',
+      logger: process.env.NODE_ENV === 'development' ? null : false,
       authMethods: ['PLAIN', 'LOGIN', 'XOAUTH2'],
       onAuth: function handleAuth(auth, session, callback) {
         switch (auth.method) {

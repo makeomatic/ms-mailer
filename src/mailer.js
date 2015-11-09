@@ -12,10 +12,8 @@ const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const { format: fmt } = require('util');
 
-// postfix configuration
-const validator = new Validation(path.resolve(__dirname, './schemas'));
-const { validate } = validator;
-const validatorInitPromise = validator.init();
+// validator configuration
+const { validate } = new Validation(path.resolve(__dirname, './schemas'));
 
 /**
  * @namespace Mailer
@@ -61,8 +59,9 @@ module.exports = class Mailer extends EventEmitter {
 
     if (config.debug === true) {
       this.on('log', this.log.bind(this, 'ms-mailer'));
-      this.log('configuration', JSON.stringify(config));
     }
+
+    this.emit('log', JSON.stringify(config));
 
     // init predefined transports
     const predefinedAccounts = config.accounts || {};
@@ -100,15 +99,26 @@ module.exports = class Mailer extends EventEmitter {
    */
   router = (message, headers, actions, next) => {
     const route = headers.routingKey.split('.').pop();
+    const config = this._config;
 
+    let promise;
     switch (route) {
-    case this._config.postfix_predefined:
-      return this.predefined(message, headers, actions, next);
-    case this._config.postfix_adhoc:
-      return this.adhoc(message, headers, actions, next);
+    case config.postfixPredefined:
+      promise = this.predefined(message, headers, actions);
+      break;
+    case config.postfixAdhoc:
+      promise = this.adhoc(message, headers, actions);
+      break;
     default:
-      return next(new Errors.NotImplementedError(fmt('method "%s"', route)));
+      promise = Promise.reject(new Errors.NotImplementedError(fmt('method "%s"', route)));
+      break;
     }
+
+    if (typeof next === 'function') {
+      return promise.asCallback(next);
+    }
+
+    return promise;
   }
 
   /**
@@ -116,17 +126,15 @@ module.exports = class Mailer extends EventEmitter {
    * @param  {Mixed}    message { account: String, email }
    * @param  {Object}   headers
    * @param  {Object}   actions - not handled at the moment
-   * @param  {Function} next    - response function
    * @return {Promise}
    */
-  predefined(message, headers, actions, next) {
+  predefined(message) {
     return validate('predefined', message)
       .return(message.account)
       .then(this.getTransport)
       .then((transport) => {
         return this.sendMail(transport, message.email);
-      })
-      .asCallback(next);
+      });
   }
 
   /**
@@ -134,18 +142,16 @@ module.exports = class Mailer extends EventEmitter {
    * @param  {Mixed}    message { account: Object, email }
    * @param  {Object}   headers
    * @param  {Object}   actions - not handled at the moment
-   * @param  {Function} next    - response function
    * @return {Promise}
    */
-  adhoc(message, headers, actions, next) {
+  adhoc(message) {
     return validate('adhoc', message)
       .then(() => {
         const disposableConnection = this.initDisposableTransport(message.account);
         return Promise.using(disposableConnection, (transport) => {
           return this.sendMail(transport, message.email);
         });
-      })
-      .asCallback(next);
+      });
   }
 
   /**
@@ -226,23 +232,25 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   connect() {
+    this.emit('log', 'connecting to amqp');
+
     if (this._amqp) {
       return Promise.reject(new Errors.NotPermittedError('service was already started'));
     }
 
     // once transport is initialized - return instance of self
     const config = this._config;
-    return validatorInitPromise
+    return validate('config', config)
       .then(() => {
-        return validate('config', config);
-      })
-      .then(() => {
+        this.emit('log', 'validated config');
+
         return Promise.all([
-          AMQPTransport.connect(config.amqp, this.router).then((amqp) => {
-            this._amqp = amqp;
-          }),
+          AMQPTransport.connect(config.amqp, this.router).then((amqp) => { this._amqp = amqp; }),
           this._initTransports,
         ]);
+      })
+      .tap(() => {
+        this.emit('log', 'connected to amqp and transports');
       })
       .return(this);
   }
