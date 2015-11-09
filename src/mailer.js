@@ -28,24 +28,19 @@ module.exports = class Mailer extends EventEmitter {
    */
   static defaultOpts = {
     debug: process.env.NODE_ENV === 'development',
-    postfix_adhoc: process.env.MS_MAILER_ADHOC_POSTFIX || 'adhoc',
-    postfix_predefined: process.env.MS_MAILER_PREDEFINED_POSTFIX || 'predefined',
-    prefix: process.env.MS_MAILER_PREFIX || 'mailer',
+    postfixAdhoc: 'adhoc',
+    postfixPredefined: 'predefined',
+    prefix: 'mailer',
     predefinedLimits: {
-      maxConnections: process.env.MS_MAILER_PRE_MAX_CONNECTIONS || 2,
-      maxMessages: process.env.MS_MAILER_PRE_MAX_MESSAGES || 2000,
+      maxConnections: 2,
+      maxMessages: 2000,
     },
     amqp: {
-      queue: process.env.MS_MAILER_QUEUE_NANE || 'ms-mailer',
+      queue: 'ms-mailer',
     },
     // https://www.npmjs.com/package/html-to-text
     htmlToText: {
-      tables: [],
-      wordwrap: process.env.MS_MAILER_WORD_WRAP || 140,
-      linkHrefBaseUrl: process.env.MS_MAILER_LINK_HREF_BASE_URL || null,
-      hideLinkHrefIfSameAsText: true,
-      ignoreHref: true,
-      ignoreImage: true,
+      wordwrap: 140,
     },
   };
 
@@ -60,13 +55,13 @@ module.exports = class Mailer extends EventEmitter {
 
     // setup routes to listen
     const prefix = config.prefix;
-    config.amqp.listen = [ config.postfix_adhoc, config.postfix_predefined ].map((postfix) => {
+    config.amqp.listen = [ config.postfixAdhoc, config.postfixPredefined ].map((postfix) => {
       return `${prefix}.${postfix}`;
     });
 
     if (config.debug === true) {
       this.on('log', this.log.bind(this, 'ms-mailer'));
-      this.emit('log', 'configuration', JSON.stringify(config));
+      this.log('configuration', JSON.stringify(config));
     }
 
     // init predefined transports
