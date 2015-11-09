@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 NODE_VERSIONS := 5.0.0 4.2.2 0.12.7
-PKG_VERSION := $(cat package.json | ./node_modules/.bin/json version)
+PKG_VERSION := $(shell cat package.json | ./node_modules/.bin/json version)
 
 # define task lists
 TEST_TASKS := $(addsuffix .test, $(NODE_VERSIONS))
@@ -26,6 +26,7 @@ $(BUILD_TASKS):
 	docker tag -f makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION) makeomatic/ms-mailer:$(basename $@)
 
 $(PUSH_TASKS):
-	docker push makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION) makeomatic/ms-mailer:$(basename $@)
+	docker push makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION)
+	docker push makeomatic/ms-mailer:$(basename $@)
 
 .PHONY: test build push
