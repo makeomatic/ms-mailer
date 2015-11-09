@@ -24,10 +24,8 @@ coverage
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
-# es6 source code
+# User defined
 src
-
-# test dir
 test
 Makefile
 .env

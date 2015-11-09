@@ -33,6 +33,7 @@
     "eslint": "^1.8.0",
     "eslint-config-airbnb": "^0.1.0",
     "eslint-plugin-mocha": "^1.0.0",
+    "json": "^9.0.3",
     "mocha": "^2.3.3",
     "smtp-server": "^1.7.1"
   },
