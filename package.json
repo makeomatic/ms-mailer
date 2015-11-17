@@ -1,13 +1,13 @@
 {
   "name": "ms-mailer",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
   "scripts": {
-    "prepublish": "babel ./src -d ./lib --optional es7.objectRestSpread,es7.classProperties,es7.decorators && mkdir -p ./lib/schemas && cp ./src/schemas/*.json ./lib/schemas/",
+    "prepublish": "babel ./src -d ./lib --optional es7.objectRestSpread,es7.classProperties,es7.decorators",
     "test": "npm rebuild && BLUEBIRD_DEBUG=1 NODE_ENV=production ./node_modules/.bin/mocha --require ./test/babelhook.js --bail --timeout 10000 -R xunit > test-report-$(node -v).xml",
     "test-local": "NODE_ENV=development BLUEBIRD_DEBUG=1 ./node_modules/.bin/mocha --require ./test/babelhook.js",
-    "start": "node ./bin/mservice.js"
+    "start": "node ./bin/mservice.js | ./node_modules/.bin/bunyan -o short"
   },
   "keywords": [
     "microservice",
@@ -39,16 +39,17 @@
   },
   "dependencies": {
     "bluebird": "^3.0.5",
+    "bunyan": "^1.5.1",
     "common-errors": "^0.5.3",
     "dotenv": "^1.2.0",
     "eventemitter3": "^1.1.1",
     "is-my-json-valid": "^2.12.3",
     "lodash": "^3.10.1",
-    "ms-amqp-conf": "^0.1.0",
+    "ms-amqp-conf": "^0.2.0",
     "ms-amqp-transport": "^0.2.5",
-    "ms-amqp-validation": "^0.2.0",
+    "ms-amqp-validation": "^0.4.1",
     "nconf": "^0.8.2",
-    "nodemailer": "^1.9.0",
+    "nodemailer": "^1.10.0",
     "nodemailer-dkim": "^1.0.3",
     "nodemailer-html-to-text": "^1.0.2",
     "nodemailer-plugin-inline-base64": "^1.0.1",

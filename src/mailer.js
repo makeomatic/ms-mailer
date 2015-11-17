@@ -13,7 +13,7 @@ const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const { format: fmt } = require('util');
 
 // validator configuration
-const { validate } = new Validation(path.resolve(__dirname, './schemas'));
+const { validate } = new Validation('../schemas');
 
 /**
  * @namespace Mailer
