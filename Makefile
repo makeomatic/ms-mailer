@@ -1,6 +1,9 @@
 SHELL := /bin/bash
-NODE_VERSIONS := 5.0.0 4.2.2 0.12.7
+NODE_VERSIONS := 5.1.0
+DOCKER_ORG := makeomatic
+PKG_NAME := $(shell cat package.json | ./node_modules/.bin/json name)
 PKG_VERSION := $(shell cat package.json | ./node_modules/.bin/json version)
+TAG_BASE := $(DOCKER_ORG)/$(PKG_NAME)
 
 # define task lists
 TEST_TASKS := $(addsuffix .test, $(NODE_VERSIONS))
@@ -16,17 +19,17 @@ push: $(PUSH_TASKS)
 $(TEST_TASKS):
 	docker run -d --name=rabbitmq rabbitmq; \
 	docker run --link=rabbitmq -v ${PWD}:/usr/src/app -w /usr/src/app --rm -e TEST_ENV=docker node:$(basename $@) npm test; \
-	EXIT_CODE=$?; \
+	EXIT_CODE=$$?; \
 	docker rm -f rabbitmq; \
 	exit ${EXIT_CODE};
 
 $(BUILD_TASKS):
 	npm run prepublish
-	docker build --build-arg VERSION=v$(basename $@) -t makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION) .
-	docker tag -f makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION) makeomatic/ms-mailer:$(basename $@)
+	docker build --build-arg VERSION=v$(basename $@) -t $(TAG_BASE):$(basename $@)-$(PKG_VERSION) .
+	docker tag -f $(TAG_BASE):$(basename $@)-$(PKG_VERSION) $(TAG_BASE):$(basename $@)
 
 $(PUSH_TASKS):
-	docker push makeomatic/ms-mailer:$(basename $@)-$(PKG_VERSION)
-	docker push makeomatic/ms-mailer:$(basename $@)
+	docker push $(TAG_BASE):$(basename $@)-$(PKG_VERSION)
+	docker push $(TAG_BASE):$(basename $@)
 
 .PHONY: test build push
