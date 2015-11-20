@@ -31,6 +31,13 @@ var logger = bunyan.createLogger({
   name: service._config.name || 'ms-mailer',
   streams: streams,
 });
+service.on('log', function writeLogs(namespace, message) {
+  if (message) {
+    logger.info({ namespace }, message);
+  } else {
+    logger.info(namespace);
+  }
+});
 
 service.connect()
   .then(function serviceStarted() {

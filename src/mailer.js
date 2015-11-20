@@ -114,6 +114,11 @@ module.exports = class Mailer extends EventEmitter {
       break;
     }
 
+    promise = promise.catch((err) => {
+      this.emit('log', 'ms-mailer-error', err);
+      throw err;
+    });
+
     if (typeof next === 'function') {
       return promise.asCallback(next);
     }
