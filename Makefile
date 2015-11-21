@@ -18,7 +18,7 @@ push: $(PUSH_TASKS)
 
 $(TEST_TASKS):
 	docker run -d --name=rabbitmq rabbitmq; \
-	docker run --link=rabbitmq -v ${PWD}:/usr/src/app -w /usr/src/app --rm -e TEST_ENV=docker node:$(basename $@) npm test; \
+	docker run --link=rabbitmq -v ${PWD}:/usr/src/app -w /usr/src/app --rm -e TEST_ENV=docker node:5.0.0 npm test; \
 	EXIT_CODE=$$?; \
 	docker rm -f rabbitmq; \
 	exit ${EXIT_CODE};

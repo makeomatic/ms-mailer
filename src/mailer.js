@@ -1,10 +1,7 @@
-const AMQPTransport = require('ms-amqp-transport');
-const Validation = require('ms-amqp-validation');
+const Mservice = require('mservice');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
 const ld = require('lodash');
-const path = require('path');
-const EventEmitter = require('eventemitter3');
 const nodemailer = require('nodemailer');
 const smtpPool = require('nodemailer-smtp-pool');
 const signer = require('nodemailer-dkim').signer;
@@ -12,13 +9,10 @@ const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const { format: fmt } = require('util');
 
-// validator configuration
-const { validate } = new Validation('../schemas');
-
 /**
  * @namespace Mailer
  */
-module.exports = class Mailer extends EventEmitter {
+module.exports = class Mailer extends Mservice {
 
   /**
    * Default options that are merged into core
@@ -26,6 +20,7 @@ module.exports = class Mailer extends EventEmitter {
    */
   static defaultOpts = {
     debug: process.env.NODE_ENV === 'development',
+    logger: process.env.NODE_ENV === 'development',
     postfixAdhoc: 'adhoc',
     postfixPredefined: 'predefined',
     prefix: 'mailer',
@@ -40,6 +35,8 @@ module.exports = class Mailer extends EventEmitter {
     htmlToText: {
       wordwrap: 140,
     },
+    plugins: [ 'validator', 'logger', 'amqp' ],
+    validator: [ '../schemas/' ],
   };
 
   /**
@@ -48,8 +45,8 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Mailer}
    */
   constructor(opts = {}) {
-    super();
-    const config = this._config = ld.merge({}, Mailer.defaultOpts, opts);
+    super(ld.merge({}, Mailer.defaultOpts, opts));
+    const config = this._config;
 
     // setup routes to listen
     const prefix = config.prefix;
@@ -57,11 +54,13 @@ module.exports = class Mailer extends EventEmitter {
       return `${prefix}.${postfix}`;
     });
 
-    if (config.debug === true) {
-      this.on('log', this.log.bind(this, 'ms-mailer'));
-    }
+    this.log.debug('loaded configuration:', config);
 
-    this.emit('log', JSON.stringify(config));
+    const { error } = this.validateSync('config', config);
+    if (error) {
+      this.log.fatal('invalid configuration', error.toJSON());
+      throw error;
+    }
 
     // init predefined transports
     const predefinedAccounts = config.accounts || {};
@@ -75,18 +74,9 @@ module.exports = class Mailer extends EventEmitter {
       )
       .then((transport) => {
         transports[accountKey] = transport;
-        this.emit('log', 'accounts', fmt('created transport %s', accountKey));
+        this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
       });
     });
-  }
-
-  /**
-   * Simple debugging logger
-   * @param  {String} namespace
-   * @param  {String} message
-   */
-  log = (namespace, message) => {
-    process.stdout.write(`${namespace}> ${JSON.stringify(message)}\n`);
   }
 
   /**
@@ -98,6 +88,7 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   router = (message, headers, actions, next) => {
+    const time = process.hrtime();
     const route = headers.routingKey.split('.').pop();
     const config = this._config;
 
@@ -114,9 +105,20 @@ module.exports = class Mailer extends EventEmitter {
       break;
     }
 
-    promise = promise.catch((err) => {
-      this.emit('log', 'ms-mailer-error', err);
-      throw err;
+    // if we have an error
+    promise = promise.finally(function auditLog(response) {
+      const execTime = process.hrtime(time);
+      const meta = {
+        message,
+        headers,
+        latency: execTime[0] * 1000 + (+(execTime[1] / 1000000).toFixed(3)),
+      };
+
+      if (response instanceof Error) {
+        this.log.error(meta, 'error performing operation', response);
+      } else {
+        this.log.info(meta, 'completed operation');
+      }
     });
 
     if (typeof next === 'function') {
@@ -134,7 +136,8 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   predefined(message) {
-    return validate('predefined', message)
+    return this.validate('predefined', message)
+      .bind(this)
       .return(message.account)
       .then(this.getTransport)
       .then((transport) => {
@@ -150,8 +153,9 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   adhoc(message) {
-    return validate('adhoc', message)
-      .then(() => {
+    return this.validate('adhoc', message)
+      .bind(this)
+      .then(function initConnection() {
         const disposableConnection = this.initDisposableTransport(message.account);
         return Promise.using(disposableConnection, (transport) => {
           return this.sendMail(transport, message.email);
@@ -204,7 +208,7 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   initTransport(credentials, opts = { maxConnections: 1 }) {
-    return validate('credentials', credentials)
+    return this.validate('credentials', credentials)
       .then(() => {
         const params = ld.merge({ debug: this._config.debug }, credentials, opts);
         const transporter = nodemailer.createTransport(smtpPool(params));
@@ -221,7 +225,10 @@ module.exports = class Mailer extends EventEmitter {
         }
 
         if (params.debug) {
-          transporter.on('log', this.log.bind(this, 'ms-mailer|smtp-transport'));
+          const logger = this.log.child({ namespace: 'transport' });
+          transporter.on('log', (...args) => {
+            logger.debug.apply(logger, args);
+          });
         }
 
         transporter.use('compile', inlineBase64);
@@ -237,27 +244,14 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   connect() {
-    this.emit('log', 'connecting to amqp');
-
-    if (this._amqp) {
-      return Promise.reject(new Errors.NotPermittedError('service was already started'));
-    }
-
-    // once transport is initialized - return instance of self
-    const config = this._config;
-    return validate('config', config)
-      .then(() => {
-        this.emit('log', 'validated config');
-
-        return Promise.all([
-          AMQPTransport.connect(config.amqp, this.router).then((amqp) => { this._amqp = amqp; }),
-          this._initTransports,
-        ]);
-      })
-      .tap(() => {
-        this.emit('log', 'connected to amqp and transports');
-      })
-      .return(this);
+    return Promise.all([
+      super.connect(),
+      this._initTransports,
+    ])
+    .return(this)
+    .tap(() => {
+      this.log.info('connected to amqp and transports');
+    });
   }
 
   /**
@@ -265,20 +259,12 @@ module.exports = class Mailer extends EventEmitter {
    * @return {Promise}
    */
   close() {
-    if (!this._amqp) {
-      return Promise.reject(new Errors.NotPermittedError('service is not online'));
-    }
-
     return Promise.all([
-      this._amqp.close().then(() => {
-        this._amqp.removeListener('log', this.log);
-        this._amqp = null;
-        this._initTransports = null;
-      }),
+      super.close(),
       Promise.map(Object.keys(this._transports), (email) => {
         this._transports[email].close();
         delete this._transports[email];
-        this.emit('log', 'accounts', fmt('removed transport %s', email));
+        this.log.debug('removed transport %s', email);
       }),
     ]);
   }

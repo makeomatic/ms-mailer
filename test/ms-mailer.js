@@ -67,16 +67,20 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
 
   it('successfully starts mailer', function test() {
     mailer = new Mailer({ amqp: configuration });
-    return mailer.connect();
+    return mailer.connect()
+      .reflect()
+      .then(result => {
+        expect(result.isFulfilled()).to.be.eq(true);
+      });
   });
 
   it('fails to start mailer on invalid configuration', function test() {
-    mailer = new Mailer({
-      prefix: false,
-      amqp: configuration,
-    });
-    return mailer.connect()
-      .catchReturn({ name: 'ValidationError' }, true);
+    expect(() => {
+      return new Mailer({
+        prefix: false,
+        amqp: configuration,
+      });
+    }).to.throw({ name: 'ValidationError'});
   });
 
   it('is able to setup transports for a predefined account', function test() {
