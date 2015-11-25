@@ -8,7 +8,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
   this.timeout(10000);
 
   const configuration = { connection: {} };
-  if (process.env.TEST_ENV === 'docker') {
+  if (process.env.NODE_ENV === 'docker') {
     configuration.connection.host = process.env.RABBITMQ_PORT_5672_TCP_ADDR;
     configuration.connection.port = process.env.RABBITMQ_PORT_5672_TCP_PORT;
   }
@@ -110,6 +110,10 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           },
           {
             routingKey: 'predefined',
+          },
+          {
+            ack: function noop() {},
+            reject: function noop() {},
           }
         );
       })
@@ -130,6 +134,9 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           },
           {
             routingKey: 'adhoc',
+          },
+          {
+            ack: function noop() {},
           }
         );
       })

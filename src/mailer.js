@@ -30,6 +30,7 @@ module.exports = class Mailer extends Mservice {
     },
     amqp: {
       queue: 'ms-mailer',
+      neck: 100,
     },
     // https://www.npmjs.com/package/html-to-text
     htmlToText: {
@@ -116,8 +117,10 @@ module.exports = class Mailer extends Mservice {
 
       if (response instanceof Error) {
         this.log.error(meta, 'error performing operation', response);
+        actions.retry();
       } else {
         this.log.info(meta, 'completed operation');
+        actions.ack();
       }
     });
 
@@ -244,10 +247,10 @@ module.exports = class Mailer extends Mservice {
    * @return {Promise}
    */
   connect() {
-    return Promise.all([
+    return Promise.join(
       super.connect(),
       this._initTransports,
-    ])
+    )
     .return(this)
     .tap(() => {
       this.log.info('connected to amqp and transports');

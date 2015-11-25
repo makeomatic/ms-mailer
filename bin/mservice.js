@@ -9,7 +9,9 @@ if (process.env.NODE_ENV === 'production') {
   dir = '../lib';
 } else {
   dir = '../src';
-  require('../test/babelhook.js');
+  require('babel-core/register')({
+    optional: [ 'es7.objectRestSpread', 'es7.classProperties', 'es7.decorators' ],
+  });
 }
 
 var Service = require(dir);

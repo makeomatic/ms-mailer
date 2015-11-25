@@ -1,4 +1,5 @@
 {
+  "id": "config",
   "type": "object",
   "required": [ "prefix" ],
   "properties": {
@@ -10,7 +11,14 @@
       "type": "boolean"
     },
     "amqp": {
-      "type": "object"
+      "type": "object",
+      "required": [ "neck" ],
+      "properties": {
+        "neck": {
+          "type": "integer",
+          "min": 0
+        }
+      }
     },
     "predefinedLimits": {
       "type": "object"

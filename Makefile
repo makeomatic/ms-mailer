@@ -18,17 +18,19 @@ push: $(PUSH_TASKS)
 
 $(TEST_TASKS):
 	docker run -d --name=rabbitmq rabbitmq; \
-	docker run --link=rabbitmq -v ${PWD}:/usr/src/app -w /usr/src/app --rm -e TEST_ENV=docker node:5.0.0 npm test; \
+	docker run --link=rabbitmq -v ${PWD}:/usr/src/app -w /usr/src/app --rm -e NODE_ENV=docker node:5.0.0 npm test; \
 	EXIT_CODE=$$?; \
 	docker rm -f rabbitmq; \
 	exit ${EXIT_CODE};
 
 $(BUILD_TASKS):
 	npm run prepublish
+	docker build --build-arg VERSION=v$(basename $@) --build-arg NODE_ENV=development -t $(TAG_BASE):$(basename $@)-development .
 	docker build --build-arg VERSION=v$(basename $@) -t $(TAG_BASE):$(basename $@)-$(PKG_VERSION) .
 	docker tag -f $(TAG_BASE):$(basename $@)-$(PKG_VERSION) $(TAG_BASE):$(basename $@)
 
 $(PUSH_TASKS):
+	docker push $(TAG_BASE):$(basename $@)-development
 	docker push $(TAG_BASE):$(basename $@)-$(PKG_VERSION)
 	docker push $(TAG_BASE):$(basename $@)
 
