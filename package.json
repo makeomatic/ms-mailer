@@ -1,6 +1,6 @@
 {
   "name": "ms-mailer",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
   "scripts": {
