@@ -1,6 +1,6 @@
 {
   "name": "ms-mailer",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "babel-eslint": "^4.1.6",
     "chai": "^3.4.1",
     "eslint": "^1.10.3",
-    "eslint-config-airbnb": "^2.0.0",
+    "eslint-config-airbnb": "^2.1.0",
     "eslint-plugin-mocha": "^1.0.0",
     "json": "^9.0.3",
     "mocha": "^2.3.3",
@@ -45,8 +45,8 @@
     "lodash": "^3.10.1",
     "ms-amqp-conf": "^0.2.0",
     "ms-amqp-transport": "^0.4.0",
-    "ms-validation": "^0.5.6",
-    "mservice": "^0.13.2",
+    "ms-validation": "^0.5.7",
+    "mservice": "^1.0.0",
     "nconf": "^0.8.2",
     "nodemailer": "^1.10.0",
     "nodemailer-dkim": "^1.0.3",
