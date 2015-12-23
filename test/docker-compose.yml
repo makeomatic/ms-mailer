@@ -1,0 +1,19 @@
+rabbitmq:
+  expose:
+    - "4369"
+    - "5672"
+    - "15672"
+    - "25672"
+  image: rabbitmq
+  container_name: rabbitmq
+  hostname: rabbitmq
+
+tester:
+  image: ${IMAGE}
+  links:
+    - rabbitmq
+  working_dir: ${DIR}
+  volumes:
+    - ${PWD}:${DIR}
+  environment:
+    NODE_ENV: "docker"
