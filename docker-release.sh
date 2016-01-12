@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -f ".env" ]; then
+  source ".env";
+fi
+
 docker login -e $DOCKER_EMAIL -p $DOCKER_PWD -u $DOCKER_LOGIN || exit 1
 BUILD_ENV=${ENVS:-production development}
 NPM_PROXY=${NPM_PROXY:-https://registry.npmjs.com}

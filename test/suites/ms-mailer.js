@@ -5,8 +5,6 @@ const { SMTPServer } = require('smtp-server');
 const AMQPTransport = require('ms-amqp-transport');
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
-  this.timeout(10000);
-
   const configuration = {
     connection: {
       host: process.env.RABBITMQ_PORT_5672_TCP_ADDR || 'localhost',

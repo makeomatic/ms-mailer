@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ -f "../.env" ]; then
-  source "../.env";
-fi
-
 export NODE_ENV=development
 BIN=node_modules/.bin
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -14,6 +10,10 @@ MOCHA=$BIN/_mocha
 COVER="$BIN/isparta cover"
 NODE=$BIN/babel-node
 TESTS=${TESTS:-test/suites/*.js}
+
+if [ -f "$DIR/../.env" ]; then
+  source "$DIR/../.env";
+fi
 
 if [ -z "$NODE_VER" ]; then
   NODE_VER="5.4.0"
