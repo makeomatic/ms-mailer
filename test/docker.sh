@@ -45,6 +45,7 @@ rm -rf ./coverage
 
 echo "running tests"
 for fn in $TESTS; do
+  echo "running test on $fn"
   $COMPOSE -f $DC run --rm tester /bin/sh -c "$NODE $COVER --dir ./coverage/${fn##*/} $MOCHA -- $fn" || exit 1
 done
 

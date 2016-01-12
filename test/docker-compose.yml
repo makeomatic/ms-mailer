@@ -9,6 +9,7 @@ rabbitmq:
   hostname: rabbitmq
 
 tester:
+  container_name: tester
   image: ${IMAGE}
   links:
     - rabbitmq

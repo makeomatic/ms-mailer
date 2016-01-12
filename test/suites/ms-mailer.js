@@ -18,7 +18,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       .disposer(amqp => amqp.close());
   }
 
-  const Mailer = require('../src');
+  const Mailer = require('../../src');
   const VALID_PREDEFINED_ACCOUNTS = {
     'test-example': {
       host: 'localhost',
