@@ -1,14 +1,13 @@
 {
   "name": "ms-mailer",
-  "version": "1.0.0",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
   "scripts": {
     "compile": "./node_modules/.bin/babel -d ./lib ./src",
     "prepublish": "npm run compile",
-    "pretest": "if [[ \"$SKIP_REBUILD\" != \"1\" ]]; then npm rebuild; fi",
-    "test": "./node_modules/.bin/mocha",
-    "start": "node ./bin/mservice.js | ./node_modules/.bin/bunyan -o short"
+    "test": "./test/docker.sh",
+    "start": "node ./bin/mservice.js | ./node_modules/.bin/bunyan -o short",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "keywords": [
     "microservice",
@@ -19,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makeomatic/ms-mailer.git"
+    "url": "https://github.com/makeomatic/ms-mailer.git"
   },
   "author": "Vitaly Aminev <v@makeomatic.ru>",
   "license": "MIT",
@@ -34,12 +33,16 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.3.13",
     "chai": "^3.4.1",
+    "codecov.io": "^0.1.6",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^3.1.0",
     "eslint-plugin-mocha": "^1.0.0",
+    "isparta": "^4.0.0",
+    "istanbul": "^0.4.2",
     "json": "^9.0.3",
     "mocha": "^2.3.3",
-    "smtp-server": "^1.7.1"
+    "smtp-server": "^1.7.1",
+    "semantic-release": "^4.3.5"
   },
   "dependencies": {
     "bluebird": "^3.1.1",
