@@ -12,8 +12,8 @@ tester:
   image: ${IMAGE}
   links:
     - rabbitmq
-  working_dir: ${DIR}
+  working_dir: /src
   volumes:
-    - ${PWD}:${DIR}
+    - ${PWD}:/src
   environment:
-    NODE_ENV: "docker"
+    NODE_ENV: ${NODE_ENV}

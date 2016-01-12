@@ -18,9 +18,6 @@ const AMQP = require('ms-amqp-transport');
 
 const mailer = new Mailer({
   debug: Boolean,
-  postfixAdhoc: String,
-  postfixPredefined: String,
-  prefix: String,
   predefinedLimits: {
     maxConnections: Number,
     maxMessages: Number,

@@ -1,35 +1,27 @@
 {
   "id": "config",
   "type": "object",
-  "required": [ "prefix" ],
+  "required": [ "amqp" ],
   "properties": {
-    "prefix": {
-      "type": "string",
-      "minLength": 1
-    },
     "debug": {
       "type": "boolean"
     },
     "amqp": {
       "type": "object",
-      "required": [ "neck" ],
+      "required": [ "neck", "prefix" ],
       "properties": {
         "neck": {
           "type": "integer",
           "min": 0
+        },
+        "prefix": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
     "predefinedLimits": {
       "type": "object"
-    },
-    "postfix_adhoc": {
-      "type": "string",
-      "minLength": 1
-    },
-    "postfix_predefined": {
-      "type": "string",
-      "minLength": 1
     },
     "htmlToText": {
       "type": "object"

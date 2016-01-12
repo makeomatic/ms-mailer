@@ -3,14 +3,32 @@ const Promise = require('bluebird');
 const Errors = require('common-errors');
 const ld = require('lodash');
 const nodemailer = require('nodemailer');
-const smtpPool = require('nodemailer-smtp-pool');
 const signer = require('nodemailer-dkim').signer;
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
-const { format: fmt } = require('util');
+const path = require('path');
 
 /**
- * @namespace Mailer
+ * Accepts/rejects messages
+ */
+function ack(err, data, actionName, actions) {
+  if (err) {
+    if (err.name === 'ValidationError') {
+      actions.reject();
+      return Promise.reject(err);
+    }
+
+    this.log.error('error performing operation %s. Scheduling retry', actionName, err);
+    actions.retry();
+    return Promise.reject(err);
+  }
+
+  actions.ack();
+  return data;
+}
+
+/**
+ * @class Mailer
  */
 module.exports = class Mailer extends Mservice {
 
@@ -21,9 +39,6 @@ module.exports = class Mailer extends Mservice {
   static defaultOpts = {
     debug: process.env.NODE_ENV === 'development',
     logger: process.env.NODE_ENV === 'development',
-    postfixAdhoc: 'adhoc',
-    postfixPredefined: 'predefined',
-    prefix: 'mailer',
     predefinedLimits: {
       maxConnections: 2,
       maxMessages: 2000,
@@ -31,13 +46,18 @@ module.exports = class Mailer extends Mservice {
     amqp: {
       queue: 'ms-mailer',
       neck: 100,
+      prefix: 'mailer',
+      postfix: path.join(__dirname, 'actions'),
+      initRouter: true,
+      initRoutes: true,
+      onComplete: ack,
     },
     // https://www.npmjs.com/package/html-to-text
     htmlToText: {
       wordwrap: 140,
     },
-    plugins: [ 'validator', 'logger', 'amqp' ],
-    validator: [ '../schemas/' ],
+    plugins: ['validator', 'logger', 'amqp'],
+    validator: ['../schemas'],
   };
 
   /**
@@ -47,16 +67,8 @@ module.exports = class Mailer extends Mservice {
    */
   constructor(opts = {}) {
     super(ld.merge({}, Mailer.defaultOpts, opts));
-    const config = this._config;
 
-    // setup routes to listen
-    const prefix = config.prefix;
-    config.amqp.listen = [ config.postfixAdhoc, config.postfixPredefined ].map((postfix) => {
-      return `${prefix}.${postfix}`;
-    });
-
-    this.log.debug('loaded configuration:', config);
-
+    const config = this.config;
     const { error } = this.validateSync('config', config);
     if (error) {
       this.log.fatal('invalid configuration', error.toJSON());
@@ -64,106 +76,18 @@ module.exports = class Mailer extends Mservice {
     }
 
     // init predefined transports
-    const predefinedAccounts = config.accounts || {};
-    const accountNames = Object.keys(predefinedAccounts);
+    const accounts = config.accounts || {};
+    const accountNames = Object.keys(accounts);
     const transports = this._transports = {};
+    const limits = config.predefinedLimits;
 
-    this._initTransports = Promise.each(accountNames, (accountKey) => {
-      return this.initTransport(
-        predefinedAccounts[accountKey],
-        config.predefinedLimits
-      )
-      .then((transport) => {
+    this._initTransports = Promise.each(accountNames, accountKey => {
+      const account = accounts[accountKey];
+      return this.initTransport(account, limits).then(transport => {
         transports[accountKey] = transport;
         this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
       });
     });
-  }
-
-  /**
-   * Core router for the messages
-   * @param  {Mixed}    message { account, email }
-   * @param  {Object}   headers
-   * @param  {Object}   actions - not handled at the moment
-   * @param  {Function} next    - response function
-   * @return {Promise}
-   */
-  router = (message, headers, actions, next) => {
-    const time = process.hrtime();
-    const route = headers.routingKey.split('.').pop();
-    const config = this._config;
-
-    let promise;
-    switch (route) {
-    case config.postfixPredefined:
-      promise = this.predefined(message, headers, actions);
-      break;
-    case config.postfixAdhoc:
-      promise = this.adhoc(message, headers, actions);
-      break;
-    default:
-      promise = Promise.reject(new Errors.NotImplementedError(fmt('method "%s"', route)));
-      break;
-    }
-
-    // if we have an error
-    promise = promise.finally(function auditLog(response) {
-      const execTime = process.hrtime(time);
-      const meta = {
-        message,
-        headers,
-        latency: execTime[0] * 1000 + (+(execTime[1] / 1000000).toFixed(3)),
-      };
-
-      if (response instanceof Error) {
-        this.log.error(meta, 'error performing operation', response);
-        actions.retry();
-      } else {
-        this.log.info(meta, 'completed operation');
-        actions.ack();
-      }
-    });
-
-    if (typeof next === 'function') {
-      return promise.asCallback(next);
-    }
-
-    return promise;
-  }
-
-  /**
-   * Sends message via a predefined account
-   * @param  {Mixed}    message { account: String, email }
-   * @param  {Object}   headers
-   * @param  {Object}   actions - not handled at the moment
-   * @return {Promise}
-   */
-  predefined(message) {
-    return this.validate('predefined', message)
-      .bind(this)
-      .return(message.account)
-      .then(this.getTransport)
-      .then((transport) => {
-        return this.sendMail(transport, message.email);
-      });
-  }
-
-  /**
-   * Sends message via passed auth params for the account
-   * @param  {Mixed}    message { account: Object, email }
-   * @param  {Object}   headers
-   * @param  {Object}   actions - not handled at the moment
-   * @return {Promise}
-   */
-  adhoc(message) {
-    return this.validate('adhoc', message)
-      .bind(this)
-      .then(function initConnection() {
-        const disposableConnection = this.initDisposableTransport(message.account);
-        return Promise.using(disposableConnection, (transport) => {
-          return this.sendMail(transport, message.email);
-        });
-      });
   }
 
   /**
@@ -172,10 +96,8 @@ module.exports = class Mailer extends Mservice {
    * @param  {Object} email
    * @return {Promise}
    */
-  sendMail = (transport, email) => {
-    return Promise.fromNode((next) => {
-      transport.sendMail(email, next);
-    });
+  sendMail(transport, email) {
+    return Promise.fromNode(next => transport.sendMail(email, next));
   }
 
   /**
@@ -183,7 +105,7 @@ module.exports = class Mailer extends Mservice {
    * @param  {String} accountName [description]
    * @return {Promise}
    */
-  getTransport = (accountName) => {
+  getTransport(accountName) {
     const transport = this._transports[accountName];
     if (transport) {
       return Promise.resolve(transport);
@@ -196,9 +118,9 @@ module.exports = class Mailer extends Mservice {
    * Initializes disposable transport
    * @return {Disposer}
    */
-  initDisposableTransport() {
-    return this.initTransport
-      .apply(this, arguments)
+  initDisposableTransport(...args) {
+    return this
+      .initTransport(...args)
       .disposer(function disposeOfConnection(transport) {
         transport.close();
       });
@@ -210,28 +132,26 @@ module.exports = class Mailer extends Mservice {
    * @param  {Object} opts
    * @return {Promise}
    */
-  initTransport(credentials, opts = { maxConnections: 1 }) {
+  initTransport(credentials, _opts) {
+    const opts = ld.defaults(_opts, {
+      maxConnections: 1,
+      pool: true,
+      rateLimit: 5,
+      logger: this._logger,
+      debug: this._config.debug,
+    });
+
     return this.validate('credentials', credentials)
-      .then(() => {
-        const params = ld.merge({ debug: this._config.debug }, credentials, opts);
-        const transporter = nodemailer.createTransport(smtpPool(params));
+      .then(input => {
+        const transporter = nodemailer.createTransport({ ...input, ...opts });
 
-        if (params.dkim) {
-          const { dkim } = params;
-          if (dkim) {
-            transporter.use('stream', signer({
-              domainName: dkim.domain,
-              keySelector: dkim.selector,
-              privateKey: dkim.pk,
-            }));
-          }
-        }
-
-        if (params.debug) {
-          const logger = this.log.child({ namespace: 'transport' });
-          transporter.on('log', (...args) => {
-            logger.debug.apply(logger, args);
-          });
+        const { dkim } = input;
+        if (dkim) {
+          transporter.use('stream', signer({
+            domainName: dkim.domain,
+            keySelector: dkim.selector,
+            privateKey: dkim.pk,
+          }));
         }
 
         transporter.use('compile', inlineBase64);
@@ -247,14 +167,22 @@ module.exports = class Mailer extends Mservice {
    * @return {Promise}
    */
   connect() {
-    return Promise.join(
-      super.connect(),
-      this._initTransports,
-    )
-    .return(this)
-    .tap(() => {
-      this.log.info('connected to amqp and transports');
-    });
+    return Promise
+      .join(super.connect(), this._initTransports)
+      .return(this)
+      .tap(() => {
+        this.log.info('connected to amqp and transports');
+      });
+  }
+
+  /**
+   * Closes opened nodemailer transport
+   * @param  {String} email
+   */
+  closeTransport(email) {
+    this._transports[email].close();
+    delete this._transports[email];
+    this.log.debug('removed transport %s', email);
   }
 
   /**
@@ -262,14 +190,12 @@ module.exports = class Mailer extends Mservice {
    * @return {Promise}
    */
   close() {
-    return Promise.all([
+    const openedTransports = Object.keys(this._transports);
+
+    return Promise.join(
       super.close(),
-      Promise.map(Object.keys(this._transports), (email) => {
-        this._transports[email].close();
-        delete this._transports[email];
-        this.log.debug('removed transport %s', email);
-      }),
-    ]);
+      Promise.bind(this).return(openedTransports).map(this.closeTransport)
+    );
   }
 
 };
