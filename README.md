@@ -2,6 +2,12 @@
 
 Sets up a rabbitmq consumer with QoS, and distributes incoming messages based on passed options
 
+[![npm version](https://badge.fury.io/js/ms-mailer.svg)](https://badge.fury.io/js/ms-mailer)
+[![Build Status](https://semaphoreci.com/api/v1/projects/93fdae46-0b24-4af7-9078-fd369109b906/658194/shields_badge.svg)](https://semaphoreci.com/makeomatic/ms-mailer)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![codecov.io](https://codecov.io/github/makeomatic/ms-mailer/coverage.svg?branch=master)](https://codecov.io/github/makeomatic/ms-mailer?branch=master)
+
 ## Installation
 
 `npm i ms-mailer -S`
