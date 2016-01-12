@@ -6,8 +6,7 @@ Sets up a rabbitmq consumer with QoS, and distributes incoming messages based on
 
 `npm i ms-mailer -S`
 
-Compatible with node >= 0.12.x. Likely is also going to work on node 0.10.x, but tests are failing due to smtp-server, that is
-being used in tests, only being compatible with 0.12.x
+Compatible with node >= 4.x.x
 
 ## Usage
 

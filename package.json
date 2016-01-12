@@ -58,5 +58,13 @@
     "nodemailer-dkim": "^1.0.3",
     "nodemailer-html-to-text": "^1.0.2",
     "nodemailer-plugin-inline-base64": "^1.0.1"
+  },
+  "release": {
+    "verifyConditions": []
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
