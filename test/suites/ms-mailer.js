@@ -3,6 +3,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const { SMTPServer } = require('smtp-server');
 const AMQPTransport = require('ms-amqp-transport');
+const render = require('ms-mailer-templates');
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
   const configuration = {
@@ -131,6 +132,25 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           expect(msg.response).to.be.eq('250 OK: message queued');
         });
       });
+    });
+
+    it('is able to send email with inlined base64 images', function test() {
+      return render('cappasity-activate', {})
+        .then(template => {
+          return Promise.using(getAMQPConnection(), amqp => {
+            return amqp.publishAndWait('mailer.adhoc', {
+              account: VALID_PREDEFINED_ACCOUNTS['test-example'],
+              email: {
+                to: 'v@makeomatic.ru',
+                html: template,
+                from: 'test mailer <v@example.com>',
+              },
+            })
+            .then(msg => {
+              expect(msg.response).to.be.eq('250 OK: message queued');
+            });
+          });
+        });
     });
 
     after(function cleanup() {
