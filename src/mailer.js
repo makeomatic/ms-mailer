@@ -7,6 +7,7 @@ const signer = require('nodemailer-dkim').signer;
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const path = require('path');
+const debug = require('debug')('ms-mailer');
 
 /**
  * Accepts/rejects messages
@@ -98,6 +99,7 @@ module.exports = class Mailer extends Mservice {
    * @return {Promise}
    */
   sendMail(transport, email) {
+    debug('trying to send email %j', email);
     return Promise.fromNode(next => transport.sendMail(email, next));
   }
 
