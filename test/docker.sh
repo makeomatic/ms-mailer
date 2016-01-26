@@ -16,7 +16,7 @@ if [ -f "$DIR/../.env" ]; then
 fi
 
 if [ -z "$NODE_VER" ]; then
-  NODE_VER="5.4.0"
+  NODE_VER="5.5.0"
 fi
 
 if ! [ -x "$COMPOSE" ]; then
