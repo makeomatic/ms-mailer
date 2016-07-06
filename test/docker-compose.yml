@@ -10,11 +10,12 @@ rabbitmq:
 
 tester:
   container_name: tester
-  image: ${IMAGE}
+  image: makeomatic/node:6.2.2-tester
   links:
     - rabbitmq
   working_dir: /src
   volumes:
     - ${PWD}:/src
   environment:
-    NODE_ENV: ${NODE_ENV}
+    - NODE_ENV=test
+  command: tail -f /dev/null

@@ -2,11 +2,10 @@ SHELL := /bin/bash
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 PKG_NAME = $(shell cat package.json | ./node_modules/.bin/json name)
 PKG_VERSION = $(shell ./node_modules/.bin/latest-version $(PKG_NAME))
-NPM_PROXY = http://$(shell docker-machine ip dev):4873
 DOCKER_USER := makeomatic
 DIST := $(DOCKER_USER)/$(PKG_NAME)
-NODE_VERSIONS := 5.10.1
-ENVS := development production
+NODE_VERSIONS := 6.2.2
+ENVS := production
 TASK_LIST := $(foreach env,$(ENVS),$(addsuffix .$(env), $(NODE_VERSIONS)))
 WORKDIR := /src
 COMPOSE_FILE := test/docker-compose.yml
@@ -16,18 +15,17 @@ test:
 
 build: docker tag
 
-%.docker: ARGS = --build-arg NODE_ENV=$(NODE_ENV) --build-arg NPM_PROXY=$(NPM_PROXY)
 %.docker:
 	@echo "building $@"
 	npm run compile
-	NODE_VERSION=$(NODE_VERSION) envsubst < "./Dockerfile" > $(DOCKERFILE)
-	docker build $(ARGS) -t $(PKG_PREFIX_ENV) -f $(DOCKERFILE) .
+	NODE_ENV=$(NODE_ENV) NODE_VERSION=$(NODE_VERSION) envsubst < "./Dockerfile" > $(DOCKERFILE)
+	docker build -t $(PKG_PREFIX_ENV) -f $(DOCKERFILE) .
 	rm $(DOCKERFILE)
 
 %.production.tag:
 	@echo "tagging build $@"
-	docker tag -f $(PKG_PREFIX_ENV) $(PKG_PREFIX)
-	docker tag -f $(PKG_PREFIX_ENV) $(PKG_PREFIX)-$(PKG_VERSION)
+	docker tag $(PKG_PREFIX_ENV) $(PKG_PREFIX)
+	docker tag $(PKG_PREFIX_ENV) $(PKG_PREFIX)-$(PKG_VERSION)
 
 %.tag: ;
 
@@ -52,7 +50,7 @@ build: docker tag
 all: test build push
 
 %: COMPOSE = DIR=$(WORKDIR) IMAGE=$(IMAGE) docker-compose -f $(COMPOSE_FILE)
-%: IMAGE=$(DOCKER_USER)/alpine-node:$(NODE_VERSION)
+%: IMAGE=$(DOCKER_USER)/node:$(NODE_VERSION)
 %: NODE_VERSION = $(basename $(basename $@))
 %: NODE_ENV = $(subst .,,$(suffix $(basename $@)))
 %: DOCKERFILE = "./Dockerfile.$(NODE_VERSION)"
