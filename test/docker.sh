@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export NODE_ENV=development
+set -x
+
 BIN=node_modules/.bin
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DC="$DIR/docker-compose.yml"
@@ -10,49 +11,44 @@ MOCHA=$BIN/_mocha
 COVER="$BIN/isparta cover"
 NODE=$BIN/babel-node
 TESTS=${TESTS:-test/suites/*.js}
+COMPOSE_VER=${COMPOSE_VER:-1.7.1}
+COMPOSE="docker-compose -f $DC"
 
-if [ -f "$DIR/../.env" ]; then
-  source "$DIR/../.env";
-fi
-
-if [ -z "$NODE_VER" ]; then
-  NODE_VER="5.10.1"
-fi
-
-if ! [ -x "$COMPOSE" ]; then
+if ! [ -x "$(which docker-compose)" ]; then
   mkdir $DIR/.bin
-  curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > $DIR/.bin/docker-compose
+  curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VER}/docker-compose-`uname -s`-`uname -m` > $DIR/.bin/docker-compose
   chmod +x $DIR/.bin/docker-compose
-  COMPOSE=$(which docker-compose)
 fi
 
-function finish {
-  $COMPOSE -f $DC stop
-  $COMPOSE -f $DC rm -f
-}
-trap finish EXIT
-
-export IMAGE=makeomatic/alpine-node:$NODE_VER
-$COMPOSE -f $DC up -d
-
-if [[ "$SKIP_REBUILD" != "1" ]]; then
-  echo "rebuilding native dependencies..."
-  $COMPOSE -f $DC run --rm tester npm rebuild
+if [[ x"$CI" == x"true" ]]; then
+  trap "$COMPOSE stop; $COMPOSE rm -f -v;" EXIT
+else
+  trap "printf \"to remove containers use:\n\n$COMPOSE stop;\n$COMPOSE rm -f -v;\n\n\"" EXIT
 fi
+
+# bring compose up
+$COMPOSE up -d
 
 echo "cleaning old coverage"
 rm -rf ./coverage
 
+set -e
+
+if [[ "$SKIP_REBUILD" != "1" ]]; then
+  echo "rebuilding native dependencies..."
+  docker exec tester npm rebuild
+fi
+
 echo "running tests"
 for fn in $TESTS; do
-  echo "running test on $fn"
-  $COMPOSE -f $DC run --rm tester /bin/sh -c "$NODE $COVER --dir ./coverage/${fn##*/} $MOCHA -- $fn" || exit 1
+  echo "running tests for $fn"
+  docker exec tester /bin/sh -c "$NODE $COVER --dir ./coverage/${fn##*/} $MOCHA -- $fn"
 done
 
 echo "started generating combined coverage"
-$COMPOSE -f $DC run --rm tester node ./test/aggregate-report.js
+docker exec tester test/aggregate-report.js
 
-if [[ "$CI" == "true" ]]; then
+if [[ x"$CI" == x"true" ]]; then
   echo "uploading coverage report from ./coverage/lcov.info"
-  cat ./coverage/lcov.info | $BIN/codecov
+  $BIN/codecov -f ./coverage/lcov.info
 fi

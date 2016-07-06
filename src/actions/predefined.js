@@ -6,8 +6,7 @@
  * @return {Promise}
  */
 module.exports = function predefined(message) {
-  return this.getTransport(message.account)
-    .then(transport => {
-      return this.sendMail(transport, message.email);
-    });
+  return this
+    .getTransport(message.account)
+    .then(transport => this.sendMail(transport, message.email));
 };

@@ -124,9 +124,7 @@ module.exports = class Mailer extends Mservice {
   initDisposableTransport(...args) {
     return this
       .initTransport(...args)
-      .disposer(function disposeOfConnection(transport) {
-        transport.close();
-      });
+      .disposer(transport => transport.close());
   }
 
   /**

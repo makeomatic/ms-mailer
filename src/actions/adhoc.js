@@ -9,7 +9,7 @@ const Promise = require('bluebird');
  */
 module.exports = function adhoc(message) {
   const disposableConnection = this.initDisposableTransport(message.account);
-  return Promise.using(disposableConnection, (transport) => {
-    return this.sendMail(transport, message.email);
-  });
+  return Promise.using(disposableConnection, (transport) => (
+    this.sendMail(transport, message.email)
+  ));
 };

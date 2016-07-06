@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 
-// accepts conf through .env file
-// suitable for configuring this in the docker env
-var configuration = require('ms-amqp-conf');
-
-var dir;
-if (process.env.NODE_ENV === 'production') {
-  dir = '../lib';
-} else {
-  dir = '../src';
+let dir;
+try {
   require('babel-register');
+  dir = '../src';
+} catch (e) {
+  dir = '../lib';
 }
 
-var Service = require(dir);
-var service = new Service(configuration);
+const configuration = require('ms-conf');
+const Service = require(dir);
+const service = new Service(configuration.get('/'));
 service.connect()
   .then(function serviceStarted() {
     service.log.info('service started');
