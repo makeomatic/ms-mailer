@@ -34,8 +34,10 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "codecov": "^1.0.1",
     "eslint": "^3.0.1",
     "eslint-config-airbnb-base": "^4.0.0",
+    "eslint-plugin-import": "^1.10.2",
     "eslint-plugin-mocha": "^4.0.0",
     "isparta": "^4.0.0",
     "istanbul": "^0.4.4",
@@ -44,8 +46,7 @@
     "mocha": "^2.5.3",
     "ms-mailer-templates": "^0.7.0",
     "semantic-release": "^4.3.5",
-    "smtp-server": "^1.9.1",
-    "codecov": "^1.0.1"
+    "smtp-server": "^1.9.1"
   },
   "dependencies": {
     "bluebird": "^3.4.1",
