@@ -1,21 +1,24 @@
-rabbitmq:
-  expose:
-    - "4369"
-    - "5672"
-    - "15672"
-    - "25672"
-  image: rabbitmq
-  container_name: rabbitmq
-  hostname: rabbitmq
+version: '2'
 
-tester:
-  container_name: tester
-  image: makeomatic/node:6.2.2-tester
-  links:
-    - rabbitmq
-  working_dir: /src
-  volumes:
-    - ${PWD}:/src
-  environment:
-    - NODE_ENV=test
-  command: tail -f /dev/null
+services:
+  rabbitmq:
+    expose:
+      - "4369"
+      - "5672"
+      - "15672"
+      - "25672"
+    image: rabbitmq
+    container_name: rabbitmq
+    hostname: rabbitmq
+
+  tester:
+    container_name: tester
+    image: makeomatic/node:6.2.2-tester
+    links:
+      - rabbitmq
+    working_dir: /src
+    volumes:
+      - ${PWD}:/src
+    environment:
+      - NODE_ENV=test
+    command: tail -f /dev/null
