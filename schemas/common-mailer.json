@@ -79,12 +79,9 @@
     "email": {
       "type": "object",
       "anyOf": [
-        { "required": [ "from", "to", "html" ] },
-        { "required": [ "from", "cc", "html" ] },
-        { "required": [ "from", "bcc", "html" ] },
-        { "required": [ "from", "to", "text" ] },
-        { "required": [ "from", "cc", "text" ] },
-        { "required": [ "from", "bcc", "text" ] }
+        { "required": [ "from", "to" ] },
+        { "required": [ "from", "cc" ] },
+        { "required": [ "from", "bcc" ] }
       ],
       "properties": {
         "from": {

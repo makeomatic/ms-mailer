@@ -1,25 +1,30 @@
 const Promise = require('bluebird');
 const chai = require('chai');
-const expect = chai.expect;
 const { SMTPServer } = require('smtp-server');
 const AMQPTransport = require('ms-amqp-transport');
 const render = require('ms-mailer-templates');
 
+const expect = chai.expect;
+
 describe('MS Mailer', function AMQPTransportTestSuite() {
+  const Mailer = require('../../src');
+
   const configuration = {
-    connection: {
-      host: process.env.RABBITMQ_PORT_5672_TCP_ADDR || 'localhost',
-      port: process.env.RABBITMQ_PORT_5672_TCP_PORT || 5672,
+    transport: {
+      debug: true,
+      connection: {
+        host: 'rabbitmq',
+        port: 5672,
+      },
     },
   };
 
   function getAMQPConnection() {
     return AMQPTransport
-      .connect(configuration)
+      .connect(configuration.transport)
       .disposer(amqp => amqp.close());
   }
 
-  const Mailer = require('../../src');
   const VALID_PREDEFINED_ACCOUNTS = {
     'test-example': {
       host: 'localhost',
@@ -76,11 +81,11 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('fails to start mailer on invalid configuration', function test() {
-      expect(() => {
-        return new Mailer({
+      expect(() =>
+        new Mailer({
           amqp: { ...configuration, prefix: false },
-        });
-      }).to.throw({ name: 'ValidationError' });
+        })
+      ).to.throw({ name: 'ValidationError' });
     });
 
     it('is able to setup transports for a predefined account', function test() {
@@ -92,7 +97,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return mailer
         .connect()
         .then(() => {
-          expect(mailer._transports).to.have.ownProperty('test-example');
+          expect(mailer._transports.has('test-example')).to.be.eq(true);
         });
     });
 
@@ -111,34 +116,34 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to send a message via predefined account', function test() {
-      return Promise.using(getAMQPConnection(), (amqp) => {
-        return amqp.publishAndWait('mailer.predefined', {
+      return Promise.using(getAMQPConnection(), (amqp) =>
+        amqp.publishAndWait('mailer.predefined', {
           account: 'test-example',
           email: TEST_EMAIL,
         })
         .then(msg => {
           expect(msg.response).to.be.eq('250 OK: message queued');
-        });
-      });
+        })
+      );
     });
 
     it('is able to send a message via amqp/adhoc', function test() {
-      return Promise.using(getAMQPConnection(), (amqp) => {
-        return amqp.publishAndWait('mailer.adhoc', {
+      return Promise.using(getAMQPConnection(), (amqp) =>
+        amqp.publishAndWait('mailer.adhoc', {
           account: VALID_PREDEFINED_ACCOUNTS['test-example'],
           email: TEST_EMAIL,
         })
         .then(msg => {
           expect(msg.response).to.be.eq('250 OK: message queued');
-        });
-      });
+        })
+      );
     });
 
     it('is able to send email with inlined base64 images', function test() {
       return render('cappasity-activate', {})
-        .then(template => {
-          return Promise.using(getAMQPConnection(), amqp => {
-            return amqp.publishAndWait('mailer.adhoc', {
+        .then(template =>
+          Promise.using(getAMQPConnection(), amqp =>
+            amqp.publishAndWait('mailer.adhoc', {
               account: VALID_PREDEFINED_ACCOUNTS['test-example'],
               email: {
                 to: 'v@makeomatic.ru',
@@ -148,9 +153,30 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             })
             .then(msg => {
               expect(msg.response).to.be.eq('250 OK: message queued');
-            });
-          });
-        });
+            })
+          )
+        );
+    });
+
+    it('is able to send email with string tpl & ctx', function test() {
+      return Promise.using(getAMQPConnection(), amqp =>
+        amqp.publishAndWait('mailer.adhoc', {
+          account: VALID_PREDEFINED_ACCOUNTS['test-example'],
+          email: 'cappasity-activate',
+          ctx: {
+            nodemailer: {
+              to: 'v@makeomatic.ru',
+              from: 'test mailer <v@example.com>',
+            },
+            template: {
+              random: true,
+            },
+          },
+        })
+        .then(msg => {
+          expect(msg.response).to.be.eq('250 OK: message queued');
+        })
+      );
     });
 
     after(function cleanup() {

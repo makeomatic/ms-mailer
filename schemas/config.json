@@ -8,15 +8,20 @@
     },
     "amqp": {
       "type": "object",
-      "required": [ "neck", "prefix" ],
+      "required": ["transport", "router"],
       "properties": {
-        "neck": {
-          "type": "integer",
-          "min": 0
+        "transport": {
+          "required": [ "neck" ],
+          "type": "object",
+          "properties": {
+            "neck": {
+              "type": "integer",
+              "min": 0
+            }
+          }
         },
-        "prefix": {
-          "type": "string",
-          "minLength": 1
+        "router": {
+          "type": "object"
         }
       }
     },

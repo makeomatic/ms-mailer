@@ -7,7 +7,33 @@
       "type": "string"
     },
     "email": {
-      "$ref": "common-mailer#/definitions/email"
+      "oneOf": [{
+        "$ref": "common-mailer#/definitions/email"
+      }, {
+        "type": "string"
+      }]
+    },
+    "ctx": {
+      "type": "object",
+      "required": ["nodemailer"],
+      "properties": {
+        "template": {
+          "type": "object",
+          "default": {}
+        },
+        "nodemailer": {
+          "$ref": "common-mailer#/definitions/email"
+        }
+      }
     }
-  }
+  },
+  "switch": [{
+    "if": { "properties": { "email": { "type": "string" } } },
+    "then": { "required": ["ctx"] }
+  }, {
+    "then": {
+      "properties": { "email": { "anyOf": [{ "required": ["html"] }, { "required": ["text"] }] } },
+      "not": { "required": ["ctx"] }
+    }
+  }]
 }
