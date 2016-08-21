@@ -1,6 +1,37 @@
 {
   "id": "common-mailer",
   "definitions": {
+    "prop-email": {
+      "anyOf": [{
+        "type": "string"
+      }, {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      }]
+    },
+    "mixed-email": {
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/prop-email"
+          }
+        },
+        {
+          "$ref": "#/definitions/prop-email"
+        }
+      ]
+    },
     "account": {
       "type": "object",
       "anyOf": [
@@ -92,53 +123,16 @@
           "format": "email"
         },
         "to": {
-          "oneOf": [
-            {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "type": "string",
-                "format": "email"
-              }
-            },
-            {
-              "type": "string"
-            }
-          ]
+          "$ref": "#/definitions/mixed-email"
         },
         "cc": {
-          "oneOf": [
-            {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "type": "string",
-                "format": "email"
-              }
-            },
-            {
-              "type": "string"
-            }
-          ]
+          "$ref": "#/definitions/mixed-email"
         },
         "bcc": {
-          "oneOf": [
-            {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "type": "string",
-                "format": "email"
-              }
-            },
-            {
-              "type": "string"
-            }
-          ]
+          "$ref": "#/definitions/mixed-email"
         },
         "replyTo": {
-          "type": "string",
-          "format": "email"
+          "$ref": "#/definitions/prop-email"
         },
         "inReplyTo": {
           "type": "string"
