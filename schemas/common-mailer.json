@@ -116,10 +116,10 @@
         { "required": [ "transport" ] }
       ],
       "switch": [{
-        "if": { "properties": { "required": [ "transport" ], "transport": { "constant": "sparkpost" } } },
+        "if": { "required": [ "transport" ], "properties": { "transport": { "constant": "sparkpost" } } },
         "then": { "required": ["sparkPostApiKey"] }
       }, {
-        "if": { "properties": { "required": [ "transport" ], "transport": { "constant": "mailgun" } } },
+        "if": { "required": [ "transport" ], "properties": { "transport": { "constant": "mailgun" } } },
         "then": { "required": [ "auth" ], "properties": { "auth": { "required": ["api_key", "domain"] } } }
       }, {
         "then": {
