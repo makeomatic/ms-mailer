@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const sendMail = require('../utils/sendMail');
 
 /**
  * Sends message via passed auth params for the account
@@ -7,7 +8,7 @@ const Promise = require('bluebird');
  */
 module.exports = function adhoc({ params }) {
   const disposableConnection = this.initDisposableTransport(params.account);
-  return Promise.using(disposableConnection, (transport) => (
-    this.sendMail(transport, params.email, params.ctx)
+  return Promise.using(disposableConnection, transport => (
+    sendMail(transport, params.email, params.ctx)
   ));
 };

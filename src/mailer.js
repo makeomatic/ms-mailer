@@ -8,8 +8,6 @@ const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const path = require('path');
 const onComplete = require('./onComplete');
-const is = require('is');
-const render = require('ms-mailer-templates');
 
 /**
  * @class Mailer
@@ -75,33 +73,13 @@ module.exports = class Mailer extends Mservice {
     const transports = this._transports = new Map();
     const limits = config.predefinedLimits;
 
-    this._initTransports = Promise.each(accountNames, accountKey => {
+    this._initTransports = Promise.each(accountNames, (accountKey) => {
       const account = accounts[accountKey];
-      return this.initTransport(account, limits).then(transport => {
+      return this.initTransport(account, limits).then((transport) => {
         transports.set(accountKey, transport);
         this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
       });
     });
-  }
-
-  /**
-   * Promise wrapper over smtp transport
-   * @param  {Object} transport
-   * @param  {Object} email
-   * @return {Promise}
-   */
-  sendMail(transport, email, ctx) {
-    const template = is.string(email)
-      ? Promise.props({
-        ...ctx.nodemailer,
-        html: render(email, ctx.template),
-      })
-      : Promise.resolve(email);
-
-    return template
-      .then(renderedTemplate => Promise.fromNode(next => {
-        transport.sendMail(renderedTemplate, next);
-      }));
   }
 
   /**
@@ -144,8 +122,13 @@ module.exports = class Mailer extends Mservice {
     });
 
     return this.validate('credentials', credentials)
-      .then(input => {
-        const transporter = nodemailer.createTransport({ ...input, ...opts });
+      .then((input) => {
+        // return either the same settings or transport wrapper
+        const transport = input.ransport
+          ? require(`nodemailer-${input.transport}-transport`) // eslint-disable-line global-require
+          : ld.identity;
+
+        const transporter = nodemailer.createTransport(transport({ ...input, ...opts }));
 
         const { dkim } = input;
         if (dkim) {
