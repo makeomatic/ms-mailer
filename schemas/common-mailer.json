@@ -35,11 +35,14 @@
     },
     "account": {
       "type": "object",
-      "anyOf": [
-        { "required": [ "auth", "host", "port" ] },
-        { "required": [ "auth", "service" ] }
-      ],
       "properties": {
+        "transport": {
+          "type": "string",
+          "enum": ["sparkpost", "mailgun"]
+        },
+        "sparkPostApiKey": {
+          "type": "string"
+        },
         "service": {
           "type": "string"
         },
@@ -57,14 +60,6 @@
         },
         "auth": {
           "type": "object",
-          "anyOf": [
-            {
-              "required": [ "user", "pass" ]
-            },
-            {
-              "required": [ "user", "xoauth2" ]
-            }
-          ],
           "properties": {
             "user": {
               "type": "string"
@@ -74,6 +69,14 @@
               "minLength": 1
             },
             "xoauth2": {
+              "type": "string",
+              "minLength": 1
+            },
+            "api_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "domain": {
               "type": "string",
               "minLength": 1
             }
@@ -106,7 +109,28 @@
         "tls": {
           "type": "object"
         }
-      }
+      },
+      "anyOf": [
+        { "required": [ "host", "port" ] },
+        { "required": [ "service" ] },
+        { "required": [ "transport" ] }
+      ],
+      "switch": [{
+        "if": { "properties": { "transport": { "constant": "sparkpost" } } },
+        "then": { "required": ["sparkPostApiKey"] }
+      }, {
+        "if": { "properties": { "transport": { "constant": "mailgun" } } },
+        "then": { "required": ["auth"], "properties": { "auth": { "required": ["api_key", "domain"] } } }
+      }, {
+        "then": {
+          "required": ["auth"],
+          "properties": {
+            "auth": {
+              "anyOf": [{ "required": [ "user", "pass" ] }, { "required": [ "user", "xoauth2" ] }]
+            }
+          }
+        }
+      }]
     },
     "email": {
       "type": "object",

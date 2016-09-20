@@ -35,6 +35,17 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         pass: '123',
       },
     },
+    mailgun: {
+      transport: 'mailgun',
+      auth: {
+        api_key: 'useless',
+        domain: 'example.com',
+      },
+    },
+    sparkpost: {
+      transport: 'sparkpost',
+      sparkPostApiKey: 'invalidkey',
+    },
   };
   const TEST_EMAIL = {
     to: 'v@makeomatic.ru',

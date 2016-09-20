@@ -145,7 +145,12 @@ module.exports = class Mailer extends Mservice {
 
     return this.validate('credentials', credentials)
       .then(input => {
-        const transporter = nodemailer.createTransport({ ...input, ...opts });
+        // return either the same settings or transport wrapper
+        const transport = input.ransport
+          ? require(`nodemailer-${input.transport}-transport`) // eslint-disable-line global-require
+          : ld.identity;
+
+        const transporter = nodemailer.createTransport(transport({ ...input, ...opts }));
 
         const { dkim } = input;
         if (dkim) {
