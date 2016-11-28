@@ -10,7 +10,7 @@ module.exports = function ack(err, data, actionName, actions) {
     return data;
   }
 
-  if (err.name === 'ValidationError' || actionName === 'adhoc') {
+  if (err.name === 'ValidationError' || err.name === 'NotFoundError' || actionName === 'adhoc') {
     actions.reject();
     this.log.fatal('invalid configuration for email, rejecting', err);
     return Promise.reject(err);
