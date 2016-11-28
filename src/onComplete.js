@@ -5,17 +5,19 @@ const Promise = require('bluebird');
  */
 module.exports = function ack(err, data, actionName, actions) {
   if (!err) {
+    this.log.info('sent message via %s, ack', actionName);
     actions.ack();
     return data;
   }
 
   if (err.name === 'ValidationError' || actionName === 'adhoc') {
     actions.reject();
+    this.log.fatal('invalid configuration for email, rejecting', err);
     return Promise.reject(err);
   }
 
   // assume that predefined accounts must not fail - credentials are correct
-  this.log.error('error performing operation %s. Scheduling retry', actionName, err);
+  this.log.error('Error performing operation %s. Scheduling retry', actionName, err);
   actions.retry();
   return Promise.reject(err);
 };

@@ -1,3 +1,5 @@
+/* eslint-disable import/no-dynamic-require */
+
 const Mservice = require('mservice');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
