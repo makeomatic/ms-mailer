@@ -3,12 +3,15 @@
 const Mservice = require('mservice');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
-const ld = require('lodash');
 const nodemailer = require('nodemailer');
-const signer = require('nodemailer-dkim').signer;
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
 const path = require('path');
+
+const merge = require('lodash/merge');
+const defaults = require('lodash/defaults');
+const identity = require('lodash/identity');
+
 const onComplete = require('./onComplete');
 
 /**
@@ -22,10 +25,13 @@ module.exports = class Mailer extends Mservice {
    */
   static defaultOpts = {
     debug: process.env.NODE_ENV !== 'production',
-    logger: true,
+    logger: {
+      defaultLogger: true,
+      debug: process.env.NODE_ENV !== 'production',
+    },
     predefinedLimits: {
-      maxConnections: 2,
-      maxMessages: 2000,
+      maxConnections: 20,
+      maxMessages: Infinity,
     },
     amqp: {
       transport: {
@@ -66,7 +72,7 @@ module.exports = class Mailer extends Mservice {
    * @return {Mailer}
    */
   constructor(opts = {}) {
-    super(ld.merge({}, Mailer.defaultOpts, opts));
+    super(merge({}, Mailer.defaultOpts, opts));
     const config = this.config;
 
     // init predefined transports
@@ -80,6 +86,7 @@ module.exports = class Mailer extends Mservice {
       return this.initTransport(account, limits).then((transport) => {
         transports.set(accountKey, transport);
         this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
+        return transport;
       });
     });
   }
@@ -115,33 +122,35 @@ module.exports = class Mailer extends Mservice {
    * @return {Promise}
    */
   initTransport(credentials, _opts) {
-    const opts = ld.defaults(_opts, {
-      maxConnections: 1,
+    const opts = defaults(_opts, {
       pool: true,
       rateLimit: 5,
-      logger: this._logger,
+      logger: this._log,
       debug: this._config.debug,
     });
 
     return this.validate('credentials', credentials)
       .then((input) => {
         // return either the same settings or transport wrapper
-        const transport = input.ransport
+        const transport = input.transport
           ? require(`nodemailer-${input.transport}-transport`) // eslint-disable-line global-require
-          : ld.identity;
+          : identity;
 
-        const transporter = nodemailer.createTransport(transport({ ...input, ...opts }));
+        const finalOpts = Object.assign({ logger: true, debug: true }, input, opts);
 
-        const { dkim } = input;
+        // has different format
+        const dkim = input.dkim;
         if (dkim) {
-          transporter.use('stream', signer({
+          finalOpts.dkim = {
             domainName: dkim.domain,
             keySelector: dkim.selector,
             privateKey: dkim.pk,
-          }));
+          };
         }
 
-        transporter.use('compile', inlineBase64);
+        const transporter = nodemailer.createTransport(transport(finalOpts));
+
+        transporter.use('compile', inlineBase64({ cidPrefix: 'msm' }));
         transporter.use('compile', htmlToText(this._config.htmlToText));
 
         return transporter;
