@@ -34,6 +34,8 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         user: 'test@example.com',
         pass: '123',
       },
+      debug: true,
+      logger: true,
     },
     mailgun: {
       transport: 'mailgun',
@@ -59,7 +61,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       hideSTARTTLS: true,
       secure: false,
       closeTimeout: 2000,
-      logger: process.env.NODE_ENV === 'development' ? null : false,
+      logger: true,
       authMethods: ['PLAIN', 'LOGIN', 'XOAUTH2'],
       onAuth: function handleAuth(auth, session, callback) {
         switch (auth.method) {
@@ -86,8 +88,9 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       mailer = new Mailer({ amqp: configuration });
       return mailer.connect()
         .reflect()
-        .then(result => {
+        .then((result) => {
           expect(result.isFulfilled()).to.be.eq(true);
+          return null;
         });
     });
 
@@ -109,6 +112,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         .connect()
         .then(() => {
           expect(mailer._transports.has('test-example')).to.be.eq(true);
+          return null;
         });
     });
 
@@ -120,6 +124,11 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
   describe('connected service', function suite() {
     before(function pretest() {
       this.mailer = new Mailer({
+        logger: {
+          defaultLogger: true,
+          debug: true,
+        },
+        debug: true,
         accounts: VALID_PREDEFINED_ACCOUNTS,
         amqp: configuration,
       });
@@ -127,25 +136,27 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to send a message via predefined account', function test() {
-      return Promise.using(getAMQPConnection(), (amqp) =>
+      return Promise.using(getAMQPConnection(), amqp =>
         amqp.publishAndWait('mailer.predefined', {
           account: 'test-example',
           email: TEST_EMAIL,
         })
-        .then(msg => {
+        .then((msg) => {
           expect(msg.response).to.be.eq('250 OK: message queued');
+          return null;
         })
       );
     });
 
     it('is able to send a message via amqp/adhoc', function test() {
-      return Promise.using(getAMQPConnection(), (amqp) =>
+      return Promise.using(getAMQPConnection(), amqp =>
         amqp.publishAndWait('mailer.adhoc', {
           account: VALID_PREDEFINED_ACCOUNTS['test-example'],
           email: TEST_EMAIL,
         })
-        .then(msg => {
+        .then((msg) => {
           expect(msg.response).to.be.eq('250 OK: message queued');
+          return null;
         })
       );
     });
@@ -162,8 +173,9 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
                 from: 'test mailer <v@example.com>',
               },
             })
-            .then(msg => {
+            .then((msg) => {
               expect(msg.response).to.be.eq('250 OK: message queued');
+              return null;
             })
           )
         );
@@ -184,8 +196,9 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             },
           },
         })
-        .then(msg => {
+        .then((msg) => {
           expect(msg.response).to.be.eq('250 OK: message queued');
+          return null;
         })
       );
     });
