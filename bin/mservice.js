@@ -9,11 +9,14 @@ try {
 }
 
 const configuration = require('ms-conf');
+
+// eslint-disable-next-line import/no-dynamic-require
 const Service = require(dir);
+
 const service = new Service(configuration.get('/'));
 service.connect()
   .then(function serviceStarted() {
-    service.log.info('service started');
+    return service.log.info('service started');
   })
   .catch(function serviceCrashed(err) {
     service.log.fatal('service crashed', err);
