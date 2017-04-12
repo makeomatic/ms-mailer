@@ -12,6 +12,7 @@ describe('binary: send-email', function suite() {
     spawn(binaryPath, ['--account', 'test-example', ...args], {
       timeout: 15000,
       env: Object.assign({
+        NCONF_NAMESPACE: 'MS_MAILER',
         MS_MAILER__AMQP__TRANSPORT__CONNECTION__HOST: 'rabbitmq',
         MS_MAILER__AMQP__TRANSPORT__CONNECTION__PORT: 5672,
       }, process.env),
