@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@makeomatic/deploy@^1.0.13":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@makeomatic/deploy/-/deploy-1.0.13.tgz#0956f8af2523533370cb13607243e71e89a7cb90"
+"@makeomatic/deploy@^1.0.14":
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@makeomatic/deploy/-/deploy-1.0.14.tgz#19bacb3f840125c7c5f938eda2db38bf5f90d27a"
   dependencies:
     death "^1.1.0"
     glob "^7.1.1"
