@@ -1,5 +1,7 @@
 # Mailer Microservice
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/makeomatic/ms-mailer.svg)](https://greenkeeper.io/)
+
 Sets up a rabbitmq consumer with QoS, and distributes incoming messages based on passed options
 
 [![npm version](https://badge.fury.io/js/ms-mailer.svg)](https://badge.fury.io/js/ms-mailer)
