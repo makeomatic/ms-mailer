@@ -62,7 +62,7 @@
     "ms-amqp-transport": "^7.0.1",
     "ms-conf": "^3.1.2",
     "ms-mailer-templates": "^1.0.0",
-    "ms-validation": "^3.0.0",
+    "ms-validation": "^4.0.0",
     "mservice": "^6.0.1",
     "nodemailer": "^4.0.0",
     "nodemailer-html-to-text": "^2.1.0",
