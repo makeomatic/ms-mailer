@@ -37,6 +37,19 @@ const argv = require('yargs')
     choices: ['text', 'html'],
     default: 'text',
   })
+  .option('attachment', {
+    describe: 'attachment',
+    array: true,
+    coerce: collection => collection.map((arg) => {
+      let resp;
+      try {
+        resp = JSON.parse(Buffer.from(arg, 'base64'));
+      } catch (e) {
+        resp = { path: arg };
+      }
+      return resp;
+    }),
+  })
   .help('h')
   .argv;
 
@@ -68,6 +81,11 @@ const sendEmail = (amqp) => {
   };
 
   message.email[argv.type] = argv.body;
+
+  // add attachments, ensure they are local
+  if (Array.isArray(argv.attachment) && argv.attachment.length > 0) {
+    message.email.attachments = argv.attachment;
+  }
 
   return amqp
     .publishAndWait(route, message, { timeout: 60000 })

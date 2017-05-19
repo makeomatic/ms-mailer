@@ -1,35 +1,42 @@
 {
-  "id": "config",
-  "type": "object",
-  "required": [ "amqp" ],
-  "properties": {
-    "debug": {
-      "type": "boolean"
-    },
-    "amqp": {
-      "type": "object",
-      "required": ["transport", "router"],
-      "properties": {
-        "transport": {
-          "required": [ "neck" ],
-          "type": "object",
-          "properties": {
-            "neck": {
-              "type": "integer",
-              "min": 0
-            }
-          }
+    "$id": "config",
+    "type": "object",
+    "required": [
+        "amqp"
+    ],
+    "properties": {
+        "debug": {
+            "type": "boolean"
         },
-        "router": {
-          "type": "object"
+        "amqp": {
+            "type": "object",
+            "required": [
+                "transport",
+                "router"
+            ],
+            "properties": {
+                "transport": {
+                    "required": [
+                        "neck"
+                    ],
+                    "type": "object",
+                    "properties": {
+                        "neck": {
+                            "type": "integer",
+                            "min": 0
+                        }
+                    }
+                },
+                "router": {
+                    "type": "object"
+                }
+            }
+        },
+        "predefinedLimits": {
+            "type": "object"
+        },
+        "htmlToText": {
+            "type": "object"
         }
-      }
-    },
-    "predefinedLimits": {
-      "type": "object"
-    },
-    "htmlToText": {
-      "type": "object"
     }
-  }
 }

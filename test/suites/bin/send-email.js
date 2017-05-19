@@ -87,4 +87,29 @@ describe('binary: send-email', function suite() {
       // assert stuff
     }, args);
   });
+
+  it('is able to send an email with attachments', function test(next) {
+    const args = [
+      ...basicArgs,
+      '--type',
+      'html',
+      '--body',
+      '<strong>very nice html</strong>',
+      '--attachment',
+      Buffer.from(JSON.stringify({ filename: 'example.csv', content: 'id,header\n1,normal' })).toString('base64'),
+      '--attachment',
+      './test/fixture/text.csv',
+    ];
+
+    exec((err, lines) => {
+      if (err) {
+        return next(err);
+      }
+
+      assert.equal(lines[1], '250 OK: message queued');
+      return next();
+
+      // assert stuff
+    }, args);
+  });
 });
