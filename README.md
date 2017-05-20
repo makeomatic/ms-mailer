@@ -12,7 +12,7 @@ Sets up a rabbitmq consumer with QoS, and distributes incoming messages based on
 
 `npm i ms-mailer -S`
 
-Compatible with node >= 4.x.x
+Compatible with node >= 7.6.x
 
 ## Usage
 
@@ -107,6 +107,6 @@ Promise.props({ mailer: mailerReady, amqp: AMQP.connect() })
 ## Roadmap
 
 1. test dkim signing
-2. test different types of messages being seant
+2. test different types of messages being sent
 3. test more error cases
 4. add QoS handling on demand
