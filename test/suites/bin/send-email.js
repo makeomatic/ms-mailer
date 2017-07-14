@@ -10,7 +10,7 @@ describe('binary: send-email', function suite() {
 
   function exec(next, args = []) {
     spawn(binaryPath, ['--account', 'test-example', ...args], {
-      timeout: 15000,
+      timeout: 20000,
       env: Object.assign({
         NCONF_NAMESPACE: 'MS_MAILER',
         MS_MAILER__AMQP__TRANSPORT__CONNECTION__HOST: 'rabbitmq',
