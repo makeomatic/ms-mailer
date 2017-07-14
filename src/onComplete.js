@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const testError = require('./utils/testError');
 
 // quick way to check if action is adhoc
 const adhocregex = /\.adhoc$/;
@@ -14,7 +15,7 @@ module.exports = function ack(err, data, actionName, actions) {
     return data;
   }
 
-  if (err.name === 'ValidationError' || err.name === 'NotFoundError' || isAdHoc(actionName)) {
+  if (err.name === 'ValidationError' || err.name === 'NotFoundError' || isAdHoc(actionName) || testError(err.message)) {
     actions.reject();
     this.log.fatal('invalid configuration for email, rejecting', err);
     return Promise.reject(err);
