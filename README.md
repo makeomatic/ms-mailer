@@ -19,7 +19,7 @@ Compatible with node >= 7.6.x
 ```js
 const Promise = require('bluebird');
 const Mailer = require('ms-mailer');
-const AMQP = require('ms-amqp-transport');
+const AMQP = require('@microfleet/transport-amqp');
 
 const mailer = new Mailer({
   debug: Boolean,
@@ -28,7 +28,7 @@ const mailer = new Mailer({
     maxMessages: Number,
   },
   amqp: {
-    // ms-amqp-transport options
+    // @microfleet/transport-amqp options
   },
   htmlToText: {
     // https://www.npmjs.com/package/html-to-text

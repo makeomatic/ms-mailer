@@ -56,7 +56,7 @@ const argv = require('yargs')
 // these are basic options that we want to send
 const Mailer = require('..');
 const Promise = require('bluebird');
-const AMQPTransport = require('ms-amqp-transport');
+const AMQPTransport = require('@microfleet/transport-amqp');
 const configOverride = require('ms-conf').get('/');
 const merge = require('lodash/merge');
 const omit = require('lodash/omit');

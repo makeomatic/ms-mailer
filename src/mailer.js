@@ -1,6 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 
-const Mservice = require('mservice');
+const Mservice = require('@microfleet/core');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');

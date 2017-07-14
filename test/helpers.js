@@ -1,5 +1,5 @@
 const { SMTPServer } = require('smtp-server');
-const AMQPTransport = require('ms-amqp-transport');
+const AMQPTransport = require('@microfleet/transport-amqp');
 
 // basic configuration
 exports.AMQPConfiguration = {
