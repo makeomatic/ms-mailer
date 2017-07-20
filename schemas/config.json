@@ -29,6 +29,9 @@
                 },
                 "router": {
                     "type": "object"
+                },
+                "bindPersistantQueueToHeadersExchange": {
+                    "type": "boolean"
                 }
             }
         },

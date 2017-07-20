@@ -42,6 +42,7 @@ module.exports = class Mailer extends Mservice {
       router: {
         enabled: true,
       },
+      bindPersistantQueueToHeadersExchange: true,
     },
     router: {
       routes: {
@@ -73,6 +74,23 @@ module.exports = class Mailer extends Mservice {
    */
   constructor(opts = {}) {
     super(merge({}, Mailer.defaultOpts, opts));
+
+    this.addConnector(Mservice.ConnectorsTypes.application, () => {
+      return this.amqp.createQueue({
+        queue: 'x-delay-ms-mailer',
+        listen: [''],
+        autoDelete: false,
+        durable: true,
+        router: null,
+        arguments: {
+          'x-dead-letter-exchange': 'amq.headers',
+          'x-max-priority': 100,
+          'x-message-ttl': 5000,
+          'x-retry-count': 0,
+        },
+      });
+    });
+
     const config = this.config;
 
     // init predefined transports
@@ -85,7 +103,9 @@ module.exports = class Mailer extends Mservice {
       const account = accounts[accountKey];
       return this.initTransport(account, limits).then((transport) => {
         transports.set(accountKey, transport);
+
         this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
+
         return transport;
       });
     });
