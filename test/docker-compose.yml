@@ -13,7 +13,7 @@ services:
 
   tester:
     container_name: tester
-    image: makeomatic/node:7.10.0-tester
+    image: makeomatic/node:8.1.4-tester
     links:
       - rabbitmq
     working_dir: /src
