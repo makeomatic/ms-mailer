@@ -1,79 +1,50 @@
 {
-    "$id": "predefined",
-    "type": "object",
-    "required": [
-        "account",
-        "email"
-    ],
-    "properties": {
-        "account": {
-            "type": "string"
-        },
-        "email": {
-            "oneOf": [
-                {
-                    "$ref": "common-mailer#/definitions/email"
-                },
-                {
-                    "type": "string"
-                }
-            ]
-        },
-        "ctx": {
-            "type": "object",
-            "required": [
-                "nodemailer"
-            ],
-            "properties": {
-                "template": {
-                    "type": "object",
-                    "default": {}
-                },
-                "nodemailer": {
-                    "$ref": "common-mailer#/definitions/email"
-                }
-            }
-        }
+  "$id": "predefined",
+  "type": "object",
+  "required": ["account", "email"],
+  "properties": {
+    "account": {
+      "type": "string"
     },
-    "switch": [
-        {
-            "if": {
-                "properties": {
-                    "email": {
-                        "type": "string"
-                    }
-                }
-            },
-            "then": {
-                "required": [
-                    "ctx"
-                ]
-            }
+    "email": {
+      "oneOf": [
+        { "$ref": "common-mailer#/definitions/email" },
+        { "type": "string" }
+      ]
+    },
+    "ctx": {
+      "type": "object",
+      "required": ["nodemailer"],
+      "properties": {
+        "template": {
+          "type": "object",
+          "default": {}
         },
-        {
-            "then": {
-                "properties": {
-                    "email": {
-                        "anyOf": [
-                            {
-                                "required": [
-                                    "html"
-                                ]
-                            },
-                            {
-                                "required": [
-                                    "text"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                "not": {
-                    "required": [
-                        "ctx"
-                    ]
-                }
-            }
+        "nodemailer": {
+          "$ref": "common-mailer#/definitions/email"
         }
-    ]
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "email": { "type": "string" }
+    }
+  },
+  "then": {
+    "required": ["ctx"]
+  },
+  "else": {
+    "properties": {
+      "email": {
+        "anyOf": [
+          { "required": ["html"] },
+          { "required": ["text"] }
+        ]
+      }
+    },
+    "not": {
+      "required": ["ctx"]
+    }
+  }
 }

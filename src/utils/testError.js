@@ -9,8 +9,10 @@ const errors = [
  * @return {Boolean}
  */
 module.exports = function testError(message) {
-  for (let i = 0; i < errors.length; i += 1) {
-    if (errors[i].test(message.toLowerCase())) return true;
+  const lowerCased = message.toLowerCase();
+  // eslint-disable-next-line no-restricted-syntax
+  for (const error of errors) {
+    if (error.test(lowerCased)) return true;
   }
 
   return false;

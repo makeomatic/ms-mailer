@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const chai = require('chai');
 const render = require('ms-mailer-templates');
 const smtp = require('../helpers');
+const { ValidationError } = require('common-errors');
 
 const expect = chai.expect;
 
@@ -29,7 +30,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         new Mailer({
           amqp: { ...smtp.AMQPConfiguration, prefix: false },
         })
-      ).to.throw({ name: 'ValidationError' });
+      ).to.throw(ValidationError);
     });
 
     it('is able to setup transports for a predefined account', function test() {
@@ -56,27 +57,29 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
 
     it('is able to send a message via predefined account', function test() {
       return Promise.using(smtp.getAMQPConnection(), amqp =>
-        amqp.publishAndWait('mailer.predefined', {
-          account: 'test-example',
-          email: smtp.TEST_EMAIL,
-        })
-        .then((msg) => {
-          expect(msg.response).to.be.eq('250 OK: message queued');
-          return null;
-        })
+        amqp
+          .publishAndWait('mailer.predefined', {
+            account: 'test-example',
+            email: smtp.TEST_EMAIL,
+          })
+          .then((msg) => {
+            expect(msg.response).to.be.eq('250 OK: message queued');
+            return null;
+          })
       );
     });
 
     it('is able to send a message via amqp/adhoc', function test() {
       return Promise.using(smtp.getAMQPConnection(), amqp =>
-        amqp.publishAndWait('mailer.adhoc', {
-          account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
-          email: smtp.TEST_EMAIL,
-        })
-        .then((msg) => {
-          expect(msg.response).to.be.eq('250 OK: message queued');
-          return null;
-        })
+        amqp
+          .publishAndWait('mailer.adhoc', {
+            account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
+            email: smtp.TEST_EMAIL,
+          })
+          .then((msg) => {
+            expect(msg.response).to.be.eq('250 OK: message queued');
+            return null;
+          })
       );
     });
 
@@ -84,41 +87,66 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return render('cpst-activate', {})
         .then(template =>
           Promise.using(smtp.getAMQPConnection(), amqp =>
-            amqp.publishAndWait('mailer.adhoc', {
-              account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
-              email: {
-                to: 'v@makeomatic.ru',
-                html: template,
-                from: 'test mailer <v@example.com>',
-              },
-            })
-            .then((msg) => {
-              expect(msg.response).to.be.eq('250 OK: message queued');
-              return null;
-            })
+            amqp
+              .publishAndWait('mailer.adhoc', {
+                account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
+                email: {
+                  to: 'v@makeomatic.ru',
+                  html: template,
+                  from: 'test mailer <v@example.com>',
+                },
+              })
+              .then((msg) => {
+                expect(msg.response).to.be.eq('250 OK: message queued');
+                return null;
+              })
           )
         );
     });
 
     it('is able to send email with string tpl & ctx', function test() {
       return Promise.using(smtp.getAMQPConnection(), amqp =>
-        amqp.publishAndWait('mailer.adhoc', {
-          account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
-          email: 'cpst-activate',
-          ctx: {
-            nodemailer: {
-              to: 'v@makeomatic.ru',
-              from: 'test mailer <v@example.com>',
+        amqp
+          .publishAndWait('mailer.adhoc', {
+            account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
+            email: 'cpst-activate',
+            ctx: {
+              nodemailer: {
+                to: 'v@makeomatic.ru',
+                from: 'test mailer <v@example.com>',
+              },
+              template: {
+                random: true,
+              },
             },
-            template: {
-              random: true,
+          })
+          .then((msg) => {
+            expect(msg.response).to.be.eq('250 OK: message queued');
+            return null;
+          })
+      );
+    });
+
+    it.only('test retry with delay', function test() {
+      return Promise.using(smtp.getAMQPConnection(), amqp =>
+        amqp
+          .publishAndWait('mailer.predefined', {
+            account: 'test-example',
+            email: 'cpst-activate',
+            ctx: {
+              nodemailer: {
+                to: 'v+retry@makeomatic.ru',
+                from: 'test mailer <v@example.com>',
+              },
+              template: {
+                random: true,
+              },
             },
-          },
-        })
-        .then((msg) => {
-          expect(msg.response).to.be.eq('250 OK: message queued');
-          return null;
-        })
+          })
+          .then((msg) => {
+            expect(msg.response).to.be.eq('250 OK: message queued');
+            return null;
+          })
       );
     });
 

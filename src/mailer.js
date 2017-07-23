@@ -1,71 +1,27 @@
 /* eslint-disable import/no-dynamic-require */
 
 const Mservice = require('@microfleet/core');
+const Backoff = require('@microfleet/transport-amqp/lib/utils/recovery');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
-const path = require('path');
+const conf = require('./config');
 
 const merge = require('lodash/merge');
 const defaults = require('lodash/defaults');
 const identity = require('lodash/identity');
 
-const onComplete = require('./onComplete');
-
 /**
  * @class Mailer
  */
 module.exports = class Mailer extends Mservice {
-
   /**
    * Default options that are merged into core
    * @type {Object}
    */
-  static defaultOpts = {
-    debug: process.env.NODE_ENV !== 'production',
-    logger: {
-      defaultLogger: true,
-      debug: process.env.NODE_ENV !== 'production',
-    },
-    predefinedLimits: {
-      maxConnections: 20,
-      maxMessages: Infinity,
-    },
-    amqp: {
-      transport: {
-        queue: 'ms-mailer',
-        neck: 100,
-        onComplete,
-      },
-      router: {
-        enabled: true,
-      },
-      bindPersistantQueueToHeadersExchange: true,
-    },
-    router: {
-      routes: {
-        directory: path.join(__dirname, 'actions'),
-        prefix: 'mailer',
-        setTransportsAsDefault: true,
-        transports: [Mservice.ActionTransport.amqp],
-      },
-      extensions: {
-        enabled: ['postRequest', 'preRequest', 'preResponse'],
-        register: [
-          Mservice.routerExtension('validate/schemaLessAction'),
-          Mservice.routerExtension('audit/log'),
-        ],
-      },
-    },
-    // https://www.npmjs.com/package/html-to-text
-    htmlToText: {
-      wordwrap: 140,
-    },
-    plugins: ['validator', 'logger', 'router', 'amqp'],
-    validator: ['../schemas'],
-  };
+  static defaultOpts = conf.get('/', { env: process.env.NODE_ENV });
 
   /**
    * Updates default options and sets up predefined accounts
@@ -75,22 +31,6 @@ module.exports = class Mailer extends Mservice {
   constructor(opts = {}) {
     super(merge({}, Mailer.defaultOpts, opts));
 
-    this.addConnector(Mservice.ConnectorsTypes.application, () => {
-      return this.amqp.createQueue({
-        queue: 'x-delay-ms-mailer',
-        listen: [''],
-        autoDelete: false,
-        durable: true,
-        router: null,
-        arguments: {
-          'x-dead-letter-exchange': 'amq.headers',
-          'x-max-priority': 100,
-          'x-message-ttl': 5000,
-          'x-retry-count': 0,
-        },
-      });
-    });
-
     const config = this.config;
 
     // init predefined transports
@@ -99,16 +39,40 @@ module.exports = class Mailer extends Mservice {
     const transports = this._transports = new Map();
     const limits = config.predefinedLimits;
 
-    this._initTransports = Promise.each(accountNames, (accountKey) => {
-      const account = accounts[accountKey];
-      return this.initTransport(account, limits).then((transport) => {
-        transports.set(accountKey, transport);
+    // set retry queue up
+    const retryQueue = this.retryQueue = `x-delay-${config.amqp.transport.queue}`;
+    this.backoff = new Backoff({ qos: config.retry });
 
-        this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
+    // create extra queue for retry logic based on RabbitMQ DLX & headers exchanges
+    this.addConnector(Mservice.ConnectorsTypes.application, () => this.amqp.createQueue({
+      queue: retryQueue,
+      autoDelete: false,
+      durable: true,
+      router: null,
+      arguments: {
+        'x-dead-letter-exchange': config.amqp.transport.headersExchange.exchange,
+        'x-max-priority': 100,
+      },
+    }));
 
-        return transport;
-      });
-    });
+    // before transport is initialized - we should open connections
+    this.addConnector(Mservice.ConnectorsTypes.essential, () => (
+      Promise.each(accountNames, (accountKey) => {
+        const account = accounts[accountKey];
+        return this.initTransport(account, limits).then((transport) => {
+          transports.set(accountKey, transport);
+          this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
+          return transport;
+        });
+      })
+    ));
+
+    // close smtp transport right away so that we can't send new messages
+    // and can't ack/retry/reject either as they are stuck in there until
+    // we close the app - at which point they will be retried automatically
+    this.addDestructor(Mservice.ConnectorsTypes.application, () => (
+      Promise.bind(this, this._transports).map(this.closeTransport)
+    ));
   }
 
   /**
@@ -178,20 +142,6 @@ module.exports = class Mailer extends Mservice {
   }
 
   /**
-   * Connects to AMQP exchange, makes sure predefined accounts are created
-   * and validation is initialized
-   * @return {Promise}
-   */
-  connect() {
-    return Promise
-      .join(super.connect(), this._initTransports)
-      .return(this)
-      .tap(() => {
-        this.log.info('connected to amqp and transports');
-      });
-  }
-
-  /**
    * Closes opened nodemailer transport
    * @param  {Array} [name, transport] from @Iterable
    */
@@ -201,16 +151,4 @@ module.exports = class Mailer extends Mservice {
     this._transports.delete(name);
     this.log.debug('removed transport %s', name);
   }
-
-  /**
-   * Closes connection to AMQP exchange, removes predefined transports
-   * @return {Promise}
-   */
-  close() {
-    return Promise.join(
-      super.close(),
-      Promise.bind(this, this._transports).map(this.closeTransport)
-    );
-  }
-
 };
