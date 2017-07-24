@@ -1,6 +1,4 @@
 const Promise = require('bluebird');
-const extend = require('lodash/extend');
-const pick = require('lodash/pick');
 const testError = require('./utils/testError');
 const calculatePriority = require('./utils/calculatePriority');
 
@@ -12,6 +10,18 @@ const isAdHoc = actionName => adhocregex.test(actionName);
  * Accepts/rejects messages
  */
 module.exports = function ack(err, data, actionName, message) {
+  const { properties } = message;
+  const { headers } = properties;
+
+  // reassign back so that response can be routed properly
+  if (headers['x-correlation-id'] !== undefined) {
+    properties.correlationId = headers['x-correlation-id'];
+  }
+
+  if (headers['x-reply-to'] !== undefined) {
+    properties.replyTo = headers['x-reply-to'];
+  }
+
   if (!err) {
     this.log.info('sent message via %s, ack', actionName);
     message.ack();
@@ -19,7 +29,7 @@ module.exports = function ack(err, data, actionName, message) {
   }
 
   // check for current try
-  const retryCount = (message.properties.headers['x-retry-count'] || 0) + 1;
+  const retryCount = (headers['x-retry-count'] || 0) + 1;
 
   // quite complex, basicaly verifies that these are not logic errors
   // this is not an ad-hoc transport
@@ -50,13 +60,29 @@ module.exports = function ack(err, data, actionName, message) {
     expiration: expiration.toString(),
     priority: calculatePriority(expiration, this.config.retry.max),
     headers: {
-      'x-routing-key': message.properties.headers['x-routing-key'] || message.routingKey,
+      'x-routing-key': headers['x-routing-key'] || message.routingKey,
       'x-retry-count': retryCount,
     },
   };
 
-  // duplicate so that retry messages can route back during expiration time
-  extend(retryMessageOptions, pick(message.properties, ['replyTo', 'correlationId']));
+  // deal with special routing properties
+  const { replyTo, correlationId } = properties;
+
+  // correlation id is used in routing stuff back from DLX, so we have to "hide" it
+  // same with replyTo
+  if (replyTo !== undefined) {
+    // prefixed header so it doesn't match with the original queue
+    retryMessageOptions.headers['x-reply-to'] = replyTo;
+    // unroutable
+    retryMessageOptions.replyTo = '00000000-0000-0000-0000-000000000000';
+  }
+
+  if (correlationId !== undefined) {
+    // this is to ensure .reply will be sent back by @microfleet/transport-amqp
+    retryMessageOptions.correlationId = '00000000-0000-0000-0000-000000000000';
+    // this is to replace it back with this header in the router earlier
+    retryMessageOptions.headers['x-correlation-id'] = correlationId;
+  }
 
   return this.amqp
     .send(this.retryQueue, message.raw, retryMessageOptions)
@@ -66,6 +92,7 @@ module.exports = function ack(err, data, actionName, message) {
       return Promise.reject(err);
     })
     .then(() => {
+      this.log.debug('queued retry message');
       message.ack();
 
       // enrich error

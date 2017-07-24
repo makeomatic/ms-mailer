@@ -11,7 +11,10 @@ exports.amqp = {
     onComplete,
     bindPersistantQueueToHeadersExchange: true,
     headersExchange: {
-      exchange: 'amq.headers',
+      // private queues are bound to amq.headers
+      // so we bind to amq.match which is another default
+      // headers exchange - that way x-reply-to won't overlap
+      exchange: 'amq.match',
     },
   },
   router: {

@@ -22,7 +22,7 @@ exports.start = function startSMTPServer(done) {
     hideSTARTTLS: true,
     secure: false,
     closeTimeout: 2000,
-    logger: true,
+    logger: false,
     authMethods: ['PLAIN', 'LOGIN', 'XOAUTH2'],
     onAuth: function handleAuth(auth, session, callback) {
       switch (auth.method) {
@@ -69,12 +69,13 @@ exports.mailerStart = function startMailerService() {
       defaultLogger: true,
       debug: true,
     },
-    debug: true,
+    debug: false,
     accounts: exports.VALID_PREDEFINED_ACCOUNTS,
     amqp: {
       ...exports.AMQPConfiguration,
       transport: {
         ...exports.AMQPConfiguration.transport,
+        name: 'consumer',
         onComplete: this.onComplete,
       },
     },
@@ -90,7 +91,7 @@ exports.mailerStop = function stopMailerService() {
 
 exports.getAMQPConnection = () => (
   AMQPTransport
-    .connect(exports.AMQPConfiguration.transport)
+    .connect({ ...exports.AMQPConfiguration.transport, name: 'publisher' })
     .disposer(amqp => amqp.close())
 );
 

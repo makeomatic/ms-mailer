@@ -127,7 +127,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       );
     });
 
-    it.only('test retry with delay', function test() {
+    it('test retry with delay', function test() {
       return Promise.using(smtp.getAMQPConnection(), amqp =>
         amqp
           .publishAndWait('mailer.predefined', {
