@@ -15,9 +15,19 @@ exports.predefinedLimits = {
 
 exports.retry = {
   min: 1000,
-  max: process.env.NODE_ENV !== 'production' ? 5000 : 60 * 60 * 1000 * 5,
+  max: {
+    filter: '$env',
+    production: 60 * 60 * 1000 * 5,
+    test: 5000,
+    default: 5000,
+  },
   factor: 1.2,
-  maxRetries: process.env.NODE_ENV !== 'production' ? 3 : 100,
+  maxRetries: {
+    filter: '$env',
+    production: 100,
+    test: 3,
+    default: 3,
+  },
 };
 
 exports.router = {
