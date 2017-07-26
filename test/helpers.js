@@ -48,6 +48,13 @@ exports.start = function startSMTPServer(done) {
           return callback(err);
         }
 
+        if (session.envelope.rcptTo.find(it => it.address === 'v+retry-reject@makeomatic.ru') && retryCount < 1000) {
+          retryCount += 1;
+          err = new Error('Unexpected Server Error');
+          err.responseCode = 542;
+          return callback(err);
+        }
+
         return callback(null, 'OK: message queued');
       });
     },

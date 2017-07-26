@@ -150,6 +150,28 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       );
     });
 
+    it('is able to reject on max retries', function test() {
+      return Promise.using(smtp.getAMQPConnection(), amqp =>
+        amqp
+          .publishAndWait('mailer.predefined', {
+            account: 'test-example',
+            email: 'cpst-activate',
+            ctx: {
+              nodemailer: {
+                to: 'v+retry-reject@makeomatic.ru',
+                from: 'test mailer <v@example.com>',
+              },
+              template: {
+                random: true,
+              },
+            },
+          })
+          .catch((err) => {
+            expect(err.name).to.be.eq('Error');
+          })
+      );
+    });
+
     after('cleanup mailer', smtp.mailerStop);
   });
 });
