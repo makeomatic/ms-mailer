@@ -8,6 +8,7 @@ const expect = chai.expect;
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
   const Mailer = require('../../src');
+  const config = require('../../lib/config').get('/', { env: process.env.NODE_ENV });
 
   beforeEach('init smtp service', smtp.start);
   afterEach('close smtp service', smtp.stop);
@@ -168,7 +169,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           })
           .catch((err) => {
             expect(err.name).to.be.eq('Error');
-            expect(err.retryAttempt).to.equal(4);
+            expect(err.retryAttempt).to.equal(config.retry.maxRetries + 1);
           })
       );
     });
