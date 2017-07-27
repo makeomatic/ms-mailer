@@ -1,10 +1,9 @@
 const Promise = require('bluebird');
-const chai = require('chai');
+const assert = require('assert');
 const render = require('ms-mailer-templates');
 const smtp = require('../helpers');
 const { ValidationError } = require('common-errors');
-
-const expect = chai.expect;
+const { inspectPromise } = require('@makeomatic/deploy');
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
   const Mailer = require('../../src');
@@ -20,18 +19,16 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       mailer = new Mailer({ amqp: smtp.AMQPConfiguration });
       return mailer.connect()
         .reflect()
-        .then((result) => {
-          expect(result.isFulfilled()).to.be.eq(true);
-          return null;
-        });
+        .then(inspectPromise());
     });
 
     it('fails to start mailer on invalid configuration', function test() {
-      expect(() =>
-        new Mailer({
+      assert.throws(
+        () => new Mailer({
           amqp: { ...smtp.AMQPConfiguration, prefix: false },
-        })
-      ).to.throw(ValidationError);
+        }),
+        ValidationError
+      );
     });
 
     it('is able to setup transports for a predefined account', function test() {
@@ -43,7 +40,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return mailer
         .connect()
         .then(() => {
-          expect(mailer._transports.has('test-example')).to.be.eq(true);
+          assert.equal(mailer._transports.has('test-example'), true);
           return null;
         });
     });
@@ -64,7 +61,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             email: smtp.TEST_EMAIL,
           })
           .then((msg) => {
-            expect(msg.response).to.be.eq('250 OK: message queued');
+            assert.equal(msg.response, '250 OK: message queued');
             return null;
           })
       );
@@ -78,7 +75,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             email: smtp.TEST_EMAIL,
           })
           .then((msg) => {
-            expect(msg.response).to.be.eq('250 OK: message queued');
+            assert.equal(msg.response, '250 OK: message queued');
             return null;
           })
       );
@@ -98,7 +95,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
                 },
               })
               .then((msg) => {
-                expect(msg.response).to.be.eq('250 OK: message queued');
+                assert.equal(msg.response, '250 OK: message queued');
                 return null;
               })
           )
@@ -122,7 +119,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             },
           })
           .then((msg) => {
-            expect(msg.response).to.be.eq('250 OK: message queued');
+            assert.equal(msg.response, '250 OK: message queued');
             return null;
           })
       );
@@ -145,7 +142,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
             },
           })
           .then((msg) => {
-            expect(msg.response).to.be.eq('250 OK: message queued');
+            assert.equal(msg.response, '250 OK: message queued');
             return null;
           })
       );
@@ -167,9 +164,12 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
               },
             },
           })
-          .catch((err) => {
-            expect(err.name).to.be.eq('Error');
-            expect(err.retryAttempt).to.equal(config.retry.maxRetries + 1);
+          .reflect()
+          .then(inspectPromise(false))
+          .then((err) => {
+            assert.equal(err.name, 'Error');
+            assert.equal(err.retryAttempt, config.retry.maxRetries + 1);
+            return null;
           })
       );
     });
