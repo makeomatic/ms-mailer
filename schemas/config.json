@@ -44,45 +44,15 @@
           "type": "integer"
         },
         "max": {
-          "type": "object",
-          "properties": {
-            "filter": {
-              "type": "string"
-            },
-            "production": {
-              "type": "integer"
-            },
-            "test": {
-              "type": "integer"
-            },
-            "default": {
-              "type": "integer"
-            }
-          }
+          "type": "integer"
         },
         "factor": {
           "type": "number",
           "minimum": 1.01
         },
         "maxRetries": {
-          "type": "object",
-          "properties": {
-            "filter": {
-              "const": "$env"
-            },
-            "production": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "test": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "default": {
-              "type": "integer",
-              "minimum": 0
-            }
-          }
+          "type": "integer",
+          "minimum": 0
         }
       }
     },

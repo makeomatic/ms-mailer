@@ -168,6 +168,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           })
           .catch((err) => {
             expect(err.name).to.be.eq('Error');
+            expect(err.retryAttempt).to.equal(4);
           })
       );
     });

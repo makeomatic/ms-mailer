@@ -30,6 +30,7 @@ module.exports = function ack(err, data, actionName, message) {
 
   // check for current try
   const retryCount = (headers['x-retry-count'] || 0) + 1;
+  err.retryAttempt = retryCount;
 
   // quite complex, basicaly verifies that these are not logic errors
   // this is not an ad-hoc transport
@@ -97,7 +98,6 @@ module.exports = function ack(err, data, actionName, message) {
 
       // enrich error
       err.scheduledRetry = true;
-      err.retryAttempt = retryCount;
 
       // reset correlation id
       // that way response will actually come, but won't be routed in the private router

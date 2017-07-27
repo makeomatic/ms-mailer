@@ -16,14 +16,14 @@ exports.predefinedLimits = {
 exports.retry = {
   min: 1000,
   max: {
-    filter: '$env',
+    $filter: 'env',
     production: 60 * 60 * 1000 * 5,
     test: 5000,
     default: 5000,
   },
   factor: 1.2,
   maxRetries: {
-    filter: '$env',
+    $filter: 'env',
     production: 100,
     test: 3,
     default: 3,
