@@ -54,17 +54,14 @@ const argv = require('yargs')
   .argv;
 
 // these are basic options that we want to send
-const Mailer = require('..');
 const Promise = require('bluebird');
-const AMQPTransport = require('ms-amqp-transport');
-const configOverride = require('ms-conf').get('/');
-const merge = require('lodash/merge');
+const AMQPTransport = require('@microfleet/transport-amqp');
 const omit = require('lodash/omit');
 const pick = require('lodash/pick');
-
+const config = require('../lib/config').get('/', { env: process.env.NODE_ENV });
 // App level code
-const config = merge({}, Mailer.defaultOpts, configOverride);
-const amqpConfig = omit(config.amqp.transport, ['queue', 'listen', 'neck', 'onComplete']);
+
+const amqpConfig = omit(config.amqp.transport, ['queue', 'listen', 'neck', 'onComplete', 'bindPersistantQueueToHeadersExchange']);
 const prefix = config.router.routes.prefix;
 const getTransport = () => {
   console.info('establishing connection to amqp with %j', amqpConfig);

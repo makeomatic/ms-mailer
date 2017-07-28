@@ -1,5 +1,7 @@
 const { SMTPServer } = require('smtp-server');
-const AMQPTransport = require('ms-amqp-transport');
+const AMQPTransport = require('@microfleet/transport-amqp');
+const sinon = require('sinon');
+const onComplete = require('../src/onComplete');
 
 // basic configuration
 exports.AMQPConfiguration = {
@@ -15,11 +17,12 @@ exports.AMQPConfiguration = {
 // helper functios
 exports.start = function startSMTPServer(done) {
   // This example starts a SMTP server using TLS with your own certificate and key
+  let retryCount = 0;
   this.server = new SMTPServer({
     hideSTARTTLS: true,
     secure: false,
     closeTimeout: 2000,
-    logger: true,
+    logger: false,
     authMethods: ['PLAIN', 'LOGIN', 'XOAUTH2'],
     onAuth: function handleAuth(auth, session, callback) {
       switch (auth.method) {
@@ -34,6 +37,27 @@ exports.start = function startSMTPServer(done) {
           return callback(new Error('Invalid username or password'));
       }
     },
+    onData(stream, session, callback) {
+      stream.on('data', () => {});
+      stream.on('end', () => {
+        let err;
+        if (session.envelope.rcptTo.find(it => it.address === 'v+retry@makeomatic.ru') && retryCount === 0) {
+          retryCount += 1;
+          err = new Error('Unexpected Server Error');
+          err.responseCode = 542;
+          return callback(err);
+        }
+
+        if (session.envelope.rcptTo.find(it => it.address === 'v+retry-reject@makeomatic.ru') && retryCount < 1000) {
+          retryCount += 1;
+          err = new Error('Unexpected Server Error');
+          err.responseCode = 542;
+          return callback(err);
+        }
+
+        return callback(null, 'OK: message queued');
+      });
+    },
   });
 
   this.server.listen(8465, '0.0.0.0', done);
@@ -45,14 +69,23 @@ exports.stop = function stopSMTPServer(done) {
 
 exports.mailerStart = function startMailerService() {
   const Mailer = require('../src');
+
+  this.onComplete = sinon.spy(onComplete);
   this.mailer = new Mailer({
     logger: {
       defaultLogger: true,
       debug: true,
     },
-    debug: true,
+    debug: false,
     accounts: exports.VALID_PREDEFINED_ACCOUNTS,
-    amqp: exports.AMQPConfiguration,
+    amqp: {
+      ...exports.AMQPConfiguration,
+      transport: {
+        ...exports.AMQPConfiguration.transport,
+        name: 'consumer',
+        onComplete: this.onComplete,
+      },
+    },
   });
   return this.mailer.connect();
 };
@@ -65,8 +98,8 @@ exports.mailerStop = function stopMailerService() {
 
 exports.getAMQPConnection = () => (
   AMQPTransport
-  .connect(exports.AMQPConfiguration.transport)
-  .disposer(amqp => amqp.close())
+    .connect({ ...exports.AMQPConfiguration.transport, name: 'publisher' })
+    .disposer(amqp => amqp.close())
 );
 
 exports.VALID_PREDEFINED_ACCOUNTS = {
