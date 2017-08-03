@@ -1,7 +1,5 @@
 const { SMTPServer } = require('smtp-server');
 const AMQPTransport = require('@microfleet/transport-amqp');
-const sinon = require('sinon');
-const onComplete = require('../src/onComplete');
 
 // basic configuration
 exports.AMQPConfiguration = {
@@ -70,20 +68,17 @@ exports.stop = function stopSMTPServer(done) {
 exports.mailerStart = function startMailerService() {
   const Mailer = require('../src');
 
-  this.onComplete = sinon.spy(onComplete);
   this.mailer = new Mailer({
     logger: {
       defaultLogger: true,
       debug: true,
     },
-    debug: false,
+    debug: true,
     accounts: exports.VALID_PREDEFINED_ACCOUNTS,
     amqp: {
-      ...exports.AMQPConfiguration,
       transport: {
-        ...exports.AMQPConfiguration.transport,
         name: 'consumer',
-        onComplete: this.onComplete,
+        ...exports.AMQPConfiguration.transport,
       },
     },
   });
