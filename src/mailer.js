@@ -1,7 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 
 const Mservice = require('@microfleet/core');
-const Backoff = require('@microfleet/transport-amqp/lib/utils/recovery');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');
@@ -38,22 +37,6 @@ module.exports = class Mailer extends Mservice {
     const accountNames = Object.keys(accounts);
     const transports = this._transports = new Map();
     const limits = config.predefinedLimits;
-
-    // set retry queue up
-    const retryQueue = this.retryQueue = `x-delay-${config.amqp.transport.queue}`;
-    this.backoff = new Backoff({ qos: config.retry });
-
-    // create extra queue for retry logic based on RabbitMQ DLX & headers exchanges
-    this.addConnector(Mservice.ConnectorsTypes.application, () => this.amqp.createQueue({
-      queue: retryQueue,
-      autoDelete: false,
-      durable: true,
-      router: null,
-      arguments: {
-        'x-dead-letter-exchange': config.amqp.transport.headersExchange.exchange,
-        'x-max-priority': 100,
-      },
-    }));
 
     // before transport is initialized - we should open connections
     this.addConnector(Mservice.ConnectorsTypes.essential, () => (

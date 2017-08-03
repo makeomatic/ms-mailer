@@ -4,11 +4,11 @@
   "required": ["amqp"],
   "properties": {
     "debug": {
-        "type": "boolean"
+      "type": "boolean"
     },
     "amqp": {
       "type": "object",
-      "required": ["transport", "router"],
+      "required": ["transport", "router", "retry"],
       "additionalProperties": false,
       "properties": {
         "transport": {
@@ -18,41 +18,14 @@
             "neck": {
               "type": "integer",
               "min": 0
-            },
-            "headersExchange": {
-              "type": "object",
-              "properties": {
-                "exchange": {
-                  "type": "string"
-                }
-              }
-            },
-            "bindPersistantQueueToHeadersExchange": {
-              "type": "boolean"
             }
           }
         },
         "router": {
           "type": "object"
-        }
-      }
-    },
-    "retry": {
-      "type": "object",
-      "properties": {
-        "min": {
-          "type": "integer"
         },
-        "max": {
-          "type": "integer"
-        },
-        "factor": {
-          "type": "number",
-          "minimum": 1.01
-        },
-        "maxRetries": {
-          "type": "integer",
-          "minimum": 0
+        "retry": {
+          "type": "object"
         }
       }
     },
@@ -62,76 +35,5 @@
     "htmlToText": {
       "type": "object"
     }
-  },
-  "switch": [{
-    "if": {
-      "required": ["amqp"],
-      "properties": {
-        "amqp": {
-          "required": ["transport"],
-          "properties": {
-            "transport": {
-              "required": ["bindPersistantQueueToHeadersExchange"],
-              "properties": {
-                "bindPersistantQueueToHeadersExchange": {
-                  "const": true
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "then": {
-      "required": ["amqp"],
-      "properties": {
-        "amqp": {
-          "required": ["transport"],
-          "properties": {
-            "transport": {
-              "required": ["headersExchange"],
-              "properties": {
-                "headersExchange": {
-                  "required": ["exchange"]
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "continue": true
-  }, {
-    "if": {
-      "required": ["retry"],
-      "properties": {
-        "retry": {
-          "required": ["maxRetries"],
-          "properties": {
-            "maxRetries": {
-              "const": 0
-            }
-          }
-        }
-      }
-    },
-    "then": {
-      "required": ["amqp"],
-      "properties": {
-        "amqp": {
-          "required": ["transport"],
-          "properties": {
-            "transport": {
-              "required": ["bindPersistantQueueToHeadersExchange"],
-              "properties": {
-                "bindPersistantQueueToHeadersExchange": {
-                  "const": false
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }]
+  }
 }

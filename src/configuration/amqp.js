@@ -1,4 +1,9 @@
-const onComplete = require('../onComplete');
+const { Error, ValidationError, NotFoundError } = require('common-errors');
+const testError = require('../utils/testError');
+
+// quick way to check if action is adhoc
+const adhocregex = /\.adhoc$/;
+const isAdHoc = actionName => adhocregex.test(actionName);
 
 /**
  * AMQP Plugin Configuration.
@@ -8,16 +13,34 @@ exports.amqp = {
   transport: {
     queue: 'ms-mailer',
     neck: 100,
-    onComplete,
     bindPersistantQueueToHeadersExchange: true,
-    headersExchange: {
-      // private queues are bound to amq.headers
-      // so we bind to amq.match which is another default
-      // headers exchange - that way x-reply-to won't overlap
-      exchange: 'amq.match',
-    },
   },
   router: {
     enabled: true,
+  },
+  retry: {
+    min: 1000,
+    factor: 1.2,
+    max: {
+      $filter: 'env',
+      production: 60 * 60 * 1000 * 5,
+      default: 5000,
+    },
+    maxRetries: {
+      $filter: 'env',
+      production: 100,
+      default: 3,
+    },
+    predicate(err, actionName) {
+      switch (err.constructor) {
+        case Error:
+        case ValidationError:
+        case NotFoundError:
+          return true;
+
+        default:
+          return isAdHoc(actionName) || testError(err.message);
+      }
+    },
   },
 };
