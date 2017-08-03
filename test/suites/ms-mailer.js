@@ -168,7 +168,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           .then(inspectPromise(false))
           .then((err) => {
             assert.equal(err.name, 'Error');
-            assert.equal(err.retryAttempt, config.retry.maxRetries + 1);
+            assert.equal(err.retryAttempt, config.amqp.retry.maxRetries + 1);
             return null;
           })
       );

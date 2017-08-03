@@ -1,4 +1,4 @@
-const { Error, ValidationError, NotFoundError } = require('common-errors');
+const { ValidationError, NotFoundError } = require('common-errors');
 const testError = require('../utils/testError');
 
 // quick way to check if action is adhoc
@@ -19,21 +19,25 @@ exports.amqp = {
     enabled: true,
   },
   retry: {
-    min: 1000,
+    enabled: true,
     factor: 1.2,
+    min: {
+      $filter: 'env',
+      $default: 50,
+      production: 1000,
+    },
     max: {
       $filter: 'env',
+      $default: 5000,
       production: 60 * 60 * 1000 * 5,
-      default: 5000,
     },
     maxRetries: {
       $filter: 'env',
+      $default: 3,
       production: 100,
-      default: 3,
     },
     predicate(err, actionName) {
       switch (err.constructor) {
-        case Error:
         case ValidationError:
         case NotFoundError:
           return true;

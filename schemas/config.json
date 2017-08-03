@@ -25,7 +25,14 @@
           "type": "object"
         },
         "retry": {
-          "type": "object"
+          "type": "object",
+          "required": ["enabled"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "const": true
+            }
+          }
         }
       }
     },
