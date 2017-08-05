@@ -41,18 +41,18 @@
     npm-registry-client "^8.4.0"
     npmlog "^4.0.0"
 
-"@microfleet/amqp-coffee@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@microfleet/amqp-coffee/-/amqp-coffee-1.0.1.tgz#b158c182345393cbd0217390d7e21d4cbfd26613"
+"@microfleet/amqp-coffee@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@microfleet/amqp-coffee/-/amqp-coffee-1.1.0.tgz#ed43ba09a0a771810ca87a2f3ca7c0d24d1f3c1a"
   dependencies:
-    async "^2.4.1"
+    async "^2.5.0"
     bson "^1.0.4"
     debug "^2.6.8"
     lodash "^4.17.4"
 
-"@microfleet/core@^9.6.0":
-  version "9.6.0"
-  resolved "https://registry.yarnpkg.com/@microfleet/core/-/core-9.6.0.tgz#9c0dd718d1548073ca6831ee24317ccf88f7a2a1"
+"@microfleet/core@^9.7.2":
+  version "9.7.2"
+  resolved "https://registry.yarnpkg.com/@microfleet/core/-/core-9.7.2.tgz#0a78aeffb91e7ac5efd7cbc7ce6d5d2865d4fd60"
   dependencies:
     bluebird "^3.5.0"
     callsite "^1.0.0"
@@ -67,13 +67,13 @@
     sort-by "^1.1.1"
     stdout-stream "^1.4.0"
 
-"@microfleet/transport-amqp@^12.1.3":
-  version "12.1.3"
-  resolved "https://registry.yarnpkg.com/@microfleet/transport-amqp/-/transport-amqp-12.1.3.tgz#a8a405f46ed2f616c75794a8985d299a642fd79c"
+"@microfleet/transport-amqp@^12.2.1":
+  version "12.2.1"
+  resolved "https://registry.yarnpkg.com/@microfleet/transport-amqp/-/transport-amqp-12.2.1.tgz#9d5cb51553e89b34bbd26d361b3ab35df3672e8a"
   dependencies:
-    "@microfleet/amqp-coffee" "^1.0.1"
+    "@microfleet/amqp-coffee" "^1.1.0"
     bluebird "^3.5.0"
-    common-errors "^1.0.2"
+    common-errors "^1.0.4"
     debug "^2.6.8"
     eventemitter3 "^2.0.3"
     hashlru "^2.2.0"
@@ -145,7 +145,7 @@ acorn@^3.0.4:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-3.3.0.tgz#45e37fb39e8da3f25baee3ff5369e2bb5f22017a"
 
-acorn@^5.0.1:
+acorn@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.1.1.tgz#53fe161111f912ab999ee887a90a0bc52822fd75"
 
@@ -358,7 +358,7 @@ async@^1.4.0, async@~1.5.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
 
-async@^2.0.1, async@^2.4.1:
+async@^2.0.1, async@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/async/-/async-2.5.0.tgz#843190fd6b7357a0b9e1c956edddd5ec8462b54d"
   dependencies:
@@ -670,9 +670,9 @@ bunyan@^1.8.12:
     mv "~2"
     safe-json-stringify "~1"
 
-bytes@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/bytes/-/bytes-2.4.0.tgz#7d97196f9d5baf7f6935e25985549edd2a6c2339"
+bytes@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/bytes/-/bytes-2.5.0.tgz#4c9423ea2d252c270c41b2bdefeff9bb6b62c06a"
 
 caching-transform@^1.0.0:
   version "1.0.1"
@@ -738,9 +738,9 @@ center-align@^0.1.1:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
 
-chai@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/chai/-/chai-4.1.0.tgz#331a0391b55c3af8740ae9c3b7458bc1c3805e6d"
+chai@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chai/-/chai-4.1.1.tgz#66e21279e6f3c6415ff8231878227900e2171b39"
   dependencies:
     assertion-error "^1.0.1"
     check-error "^1.0.1"
@@ -1182,6 +1182,10 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
 
+depd@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.0.tgz#e1bd82c6aab6ced965b97b88b17ed3e528ca18c3"
+
 detect-indent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-4.0.0.tgz#f76d064352cdf43a1cb6ce619c4ee3a9475de208"
@@ -1218,8 +1222,8 @@ dotenv@^4.0.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-4.0.0.tgz#864ef1379aced55ce6f95debecdce179f7a0cd1d"
 
 dtrace-provider@~0.8:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/dtrace-provider/-/dtrace-provider-0.8.3.tgz#ba1bfc6493285ccfcfc6ab69cd5c61d74c2a43bf"
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/dtrace-provider/-/dtrace-provider-0.8.5.tgz#98ebba221afac46e1c39fd36858d8f9367524b92"
   dependencies:
     nan "^2.3.3"
 
@@ -1320,9 +1324,9 @@ eslint-scope@^3.7.1:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.3.0.tgz#fcd7c96376bbf34c85ee67ed0012a299642b108f"
+eslint@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.4.0.tgz#a3e153e704b64f78290ef03592494eaba228d3bc"
   dependencies:
     ajv "^5.2.0"
     babel-code-frame "^6.22.0"
@@ -1332,7 +1336,7 @@ eslint@^4.3.0:
     debug "^2.6.8"
     doctrine "^2.0.0"
     eslint-scope "^3.7.1"
-    espree "^3.4.3"
+    espree "^3.5.0"
     esquery "^1.0.0"
     estraverse "^4.2.0"
     esutils "^2.0.2"
@@ -1344,7 +1348,7 @@ eslint@^4.3.0:
     imurmurhash "^0.1.4"
     inquirer "^3.0.6"
     is-resolvable "^1.0.0"
-    js-yaml "^3.8.4"
+    js-yaml "^3.9.1"
     json-stable-stringify "^1.0.1"
     levn "^0.3.0"
     lodash "^4.17.4"
@@ -1361,11 +1365,11 @@ eslint@^4.3.0:
     table "^4.0.1"
     text-table "~0.2.0"
 
-espree@^3.4.3:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/espree/-/espree-3.4.3.tgz#2910b5ccd49ce893c2ffffaab4fd8b3a31b82374"
+espree@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/espree/-/espree-3.5.0.tgz#98358625bdd055861ea27e2867ea729faf463d8d"
   dependencies:
-    acorn "^5.0.1"
+    acorn "^5.1.1"
     acorn-jsx "^3.0.0"
 
 esprima@3.x.x:
@@ -1814,9 +1818,9 @@ ggit@1.23.1:
     ramda "0.24.1"
     semver "5.4.1"
 
-ggit@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ggit/-/ggit-2.0.0.tgz#7c3d65e792836a2b2b9a76e0313534dfdfefde16"
+ggit@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ggit/-/ggit-2.0.1.tgz#6cdfbb2bac9b63108a9609923eeca44205a9e8f4"
   dependencies:
     always-error "1.0.0"
     bluebird "3.5.0"
@@ -1854,8 +1858,8 @@ git-refs@^1.1.3:
     walk "^2.3.9"
 
 github-post-release@^1.12.2:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/github-post-release/-/github-post-release-1.12.2.tgz#79fd0dfd31bd0a296230c693bbf132078306d2a9"
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/github-post-release/-/github-post-release-1.13.0.tgz#b913e5c601ceec75fdd222c1457598ed91ee46b9"
   dependencies:
     am-i-a-dependency "1.1.0"
     bluebird "3.5.0"
@@ -2099,6 +2103,15 @@ htmlparser@^1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/htmlparser/-/htmlparser-1.7.7.tgz#19e7b3997ff6fbac99ae5a7d2766489efe7e2d0e"
 
+http-errors@1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.6.1.tgz#5f8b8ed98aca545656bf572997387f904a722257"
+  dependencies:
+    depd "1.1.0"
+    inherits "2.0.3"
+    setprototypeof "1.0.3"
+    statuses ">= 1.3.1 < 2"
+
 http-proxy-agent@1:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/http-proxy-agent/-/http-proxy-agent-1.0.0.tgz#cc1ce38e453bf984a0f7702d2dd59c73d081284a"
@@ -2123,11 +2136,7 @@ https-proxy-agent@1, https-proxy-agent@^1.0.0:
     debug "2"
     extend "3"
 
-iconv-lite@0.4.15:
-  version "0.4.15"
-  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.15.tgz#fe265a218ac6a57cfe854927e9d04c19825eddeb"
-
-iconv-lite@^0.4.17:
+iconv-lite@0.4.18, iconv-lite@^0.4.17:
   version "0.4.18"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.18.tgz#23d8656b16aae6742ac29732ea8f0336a4789cf2"
 
@@ -2160,7 +2169,7 @@ inflight@^1.0.4:
     once "^1.3.0"
     wrappy "1"
 
-inherits@2, inherits@^2.0.1, inherits@^2.0.3, inherits@~2.0.0, inherits@~2.0.1, inherits@~2.0.3:
+inherits@2, inherits@2.0.3, inherits@^2.0.1, inherits@^2.0.3, inherits@~2.0.0, inherits@~2.0.1, inherits@~2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
 
@@ -2488,7 +2497,7 @@ js-tokens@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
 
-js-yaml@^3.8.4:
+js-yaml@^3.9.1:
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.9.1.tgz#08775cebdfdd359209f0d2acd383c8f86a6904a0"
   dependencies:
@@ -3557,8 +3566,8 @@ pop-iterate@^1.0.1:
   resolved "https://registry.yarnpkg.com/pop-iterate/-/pop-iterate-1.0.1.tgz#ceacfdab4abf353d7a0f2aaa2c1fc7b3f9413ba3"
 
 pre-git@^3.15.2:
-  version "3.15.2"
-  resolved "https://registry.yarnpkg.com/pre-git/-/pre-git-3.15.2.tgz#b3c2c0b88128bdbe7e4f7783ebb80768fc066219"
+  version "3.15.3"
+  resolved "https://registry.yarnpkg.com/pre-git/-/pre-git-3.15.3.tgz#834a598a0608b821ba1e9e217f58d510bc7b0ca9"
   dependencies:
     bluebird "3.5.0"
     chalk "2.0.1"
@@ -3566,7 +3575,7 @@ pre-git@^3.15.2:
     conventional-commit-message "1.1.0"
     cz-conventional-changelog "2.0.0"
     debug "2.6.8"
-    ggit "2.0.0"
+    ggit "2.0.1"
     inquirer "3.2.1"
     lazy-ass "1.6.0"
     require-relative "0.8.7"
@@ -3677,11 +3686,12 @@ randomatic@^1.1.3:
     kind-of "^4.0.0"
 
 raw-body@2:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.2.0.tgz#994976cf6a5096a41162840492f0bdc5d6e7fb96"
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.3.0.tgz#f79ce1acacaba5b6362d33454d785d7129f4bc67"
   dependencies:
-    bytes "2.4.0"
-    iconv-lite "0.4.15"
+    bytes "2.5.0"
+    http-errors "1.6.1"
+    iconv-lite "0.4.18"
     unpipe "1.0.0"
 
 rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
@@ -4082,6 +4092,10 @@ set-immediate-shim@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz#4b2b1b27eb808a9f8dcc481a58e5e56f599f3f61"
 
+setprototypeof@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.0.3.tgz#66567e37043eeb4f04d91bd658c0cbefb55b8e04"
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/shebang-command/-/shebang-command-1.2.0.tgz#44aac65b695b03398968c39f363fee5deafdf1ea"
@@ -4294,6 +4308,10 @@ ssri@^4.1.2:
   resolved "https://registry.yarnpkg.com/ssri/-/ssri-4.1.6.tgz#0cb49b6ac84457e7bdd466cb730c3cb623e9a25b"
   dependencies:
     safe-buffer "^5.1.0"
+
+"statuses@>= 1.3.1 < 2":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.3.1.tgz#faf51b9eb74aaef3b3acf4ad5f61abf24cb7b93e"
 
 stdout-stream@^1.4.0:
   version "1.4.0"
