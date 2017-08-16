@@ -52,7 +52,7 @@
     "latest-version-cli": "^1.0.0",
     "mocha": "^3.5.0",
     "nyc": "^11.1.0",
-    "semantic-release": "^6.3.2",
+    "semantic-release": "^7.0.1",
     "smtp-server": "^3.0.1"
   },
   "dependencies": {
