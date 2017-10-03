@@ -50,7 +50,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "json": "^9.0.4",
     "latest-version-cli": "^1.0.0",
-    "mocha": "^3.5.0",
+    "mocha": "^4.0.0",
     "nyc": "^11.1.0",
     "semantic-release": "^8.0.3",
     "smtp-server": "^3.0.1"
