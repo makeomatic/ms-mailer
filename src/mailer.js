@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
-const htmlToText = require('nodemailer-html-to-text').htmlToText;
+const { htmlToText } = require('nodemailer-html-to-text');
 const conf = require('./config');
 
 const merge = require('lodash/merge');
@@ -30,7 +30,7 @@ module.exports = class Mailer extends Mservice {
   constructor(opts = {}) {
     super(merge({}, Mailer.defaultOpts, opts));
 
-    const config = this.config;
+    const { config } = this;
 
     // init predefined transports
     const accounts = config.accounts || {};
@@ -106,7 +106,7 @@ module.exports = class Mailer extends Mservice {
         const finalOpts = Object.assign({ logger: true, debug: true }, input, opts);
 
         // has different format
-        const dkim = input.dkim;
+        const { dkim } = input;
         if (dkim) {
           finalOpts.dkim = {
             domainName: dkim.domain,
