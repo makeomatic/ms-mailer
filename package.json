@@ -72,7 +72,7 @@
     "nodemailer-plugin-inline-base64": "^2.1.0",
     "nodemailer-sparkpost-transport": "^2.0.0",
     "stdout-stream": "^1.4.0",
-    "yargs": "^10.0.3"
+    "yargs": "^11.0.0"
   },
   "release": {
     "verifyConditions": "@makeomatic/condition-semaphore",
