@@ -5,12 +5,11 @@ const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
-const { htmlToText } = require('nodemailer-html-to-text');
-const conf = require('./config');
-
 const merge = require('lodash/merge');
 const defaults = require('lodash/defaults');
 const identity = require('lodash/identity');
+const { htmlToText } = require('nodemailer-html-to-text');
+const conf = require('./config');
 
 /**
  * @class Mailer
