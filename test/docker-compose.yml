@@ -7,8 +7,7 @@ services:
     hostname: rabbitmq
 
   tester:
-    container_name: tester
-    image: makeomatic/node:10.8.0-tester
+    image: makeomatic/node:10.11.0-tester
     links:
       - rabbitmq
     working_dir: /src
