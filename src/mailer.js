@@ -1,6 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 
-const Mservice = require('@microfleet/core');
+const { Microfleet, ConnectorsTypes } = require('@microfleet/core');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
 const nodemailer = require('nodemailer');
@@ -14,7 +14,7 @@ const conf = require('./config');
 /**
  * @class Mailer
  */
-module.exports = class Mailer extends Mservice {
+module.exports = class Mailer extends Microfleet {
   /**
    * Default options that are merged into core
    * @type {Object}
@@ -38,7 +38,7 @@ module.exports = class Mailer extends Mservice {
     const limits = config.predefinedLimits;
 
     // before transport is initialized - we should open connections
-    this.addConnector(Mservice.ConnectorsTypes.essential, () => (
+    this.addConnector(ConnectorsTypes.essential, () => (
       Promise.each(accountNames, (accountKey) => {
         const account = accounts[accountKey];
         return this.initTransport(account, limits).then((transport) => {
@@ -52,7 +52,7 @@ module.exports = class Mailer extends Mservice {
     // close smtp transport right away so that we can't send new messages
     // and can't ack/retry/reject either as they are stuck in there until
     // we close the app - at which point they will be retried automatically
-    this.addDestructor(Mservice.ConnectorsTypes.application, () => (
+    this.addDestructor(ConnectorsTypes.application, () => (
       Promise.bind(this, this._transports).map(this.closeTransport)
     ));
   }
@@ -91,8 +91,8 @@ module.exports = class Mailer extends Mservice {
     const opts = defaults(_opts, {
       pool: true,
       rateLimit: 5,
-      logger: this._log,
-      debug: this._config.debug,
+      logger: this.log,
+      debug: this.config.debug,
     });
 
     return this.validate('credentials', credentials)
@@ -117,7 +117,7 @@ module.exports = class Mailer extends Mservice {
         const transporter = nodemailer.createTransport(transport(finalOpts));
 
         transporter.use('compile', inlineBase64({ cidPrefix: 'msm' }));
-        transporter.use('compile', htmlToText(this._config.htmlToText));
+        transporter.use('compile', htmlToText(this.config.htmlToText));
 
         return transporter;
       });

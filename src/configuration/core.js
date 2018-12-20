@@ -1,5 +1,7 @@
-const Mservice = require('@microfleet/core');
+const { ActionTransport, routerExtension } = require('@microfleet/core');
 const path = require('path');
+
+exports.name = 'mailer';
 
 exports.debug = process.env.NODE_ENV !== 'production';
 
@@ -10,7 +12,7 @@ exports.logger = {
 
 exports.predefinedLimits = {
   maxConnections: 20,
-  maxMessages: Infinity,
+  maxMessages: Number.MAX_SAFE_INTEGER,
 };
 
 exports.router = {
@@ -18,13 +20,13 @@ exports.router = {
     directory: path.join(__dirname, '../actions'),
     prefix: 'mailer',
     setTransportsAsDefault: true,
-    transports: [Mservice.ActionTransport.amqp],
+    transports: [ActionTransport.amqp],
   },
   extensions: {
     enabled: ['postRequest', 'preRequest', 'preResponse'],
     register: [
-      Mservice.routerExtension('validate/schemaLessAction'),
-      Mservice.routerExtension('audit/log'),
+      routerExtension('validate/schemaLessAction'),
+      routerExtension('audit/log'),
     ],
   },
 };

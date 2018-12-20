@@ -57,8 +57,9 @@
     "smtp-server": "^3.4.7"
   },
   "dependencies": {
-    "@microfleet/core": "^11.0.1",
+    "@microfleet/core": "^13.4.1",
     "@microfleet/transport-amqp": "^13.1.2",
+    "@microfleet/validation": "^8.1.0",
     "bluebird": "^3.5.2",
     "bunyan": "^1.8.12",
     "common-errors": "^1.0.5",
@@ -66,7 +67,6 @@
     "lodash": "^4.17.11",
     "ms-conf": "^3.3.0",
     "ms-mailer-templates": "^1.5.0",
-    "ms-validation": "^7.2.0",
     "nodemailer": "^4.6.8",
     "nodemailer-html-to-text": "^3.0.0",
     "nodemailer-mailgun-transport": "^1.4.0",
