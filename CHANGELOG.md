@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/makeomatic/ms-mailer/compare/v8.0.1...v8.1.0) (2018-12-20)
+
+
+### Features
+
+* upgrade deps ([e83051f](https://github.com/makeomatic/ms-mailer/commit/e83051f))
+
 ## [8.0.1](https://github.com/makeomatic/ms-mailer/compare/v8.0.0...v8.0.1) (2018-10-05)
 
 
