@@ -2,7 +2,7 @@
   "name": "ms-mailer",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "scripts": {
     "compile": "babel -d ./lib ./src",
     "prepublish": "yarn compile",
