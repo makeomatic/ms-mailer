@@ -1,4 +1,6 @@
 const Promise = require('bluebird');
+const { ActionTransport } = require('@microfleet/core');
+
 const sendMail = require('../utils/sendMail');
 
 /**
@@ -6,9 +8,12 @@ const sendMail = require('../utils/sendMail');
  * @param  {Mixed} params { account: Object, email, [ctx] }
  * @return {Promise}
  */
-module.exports = function adhoc({ params }) {
+function adhoc({ params }) {
   const disposableConnection = this.initDisposableTransport(params.account, { pool: false });
   return Promise.using(disposableConnection, transport => (
     sendMail(transport, params.email, params.ctx)
   ));
-};
+}
+
+module.exports = adhoc;
+adhoc.transports = [ActionTransport.amqp];

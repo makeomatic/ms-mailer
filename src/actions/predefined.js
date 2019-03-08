@@ -1,3 +1,4 @@
+const { ActionTransport } = require('@microfleet/core');
 const sendMail = require('../utils/sendMail');
 
 /**
@@ -5,8 +6,11 @@ const sendMail = require('../utils/sendMail');
  * @param  {Mixed} params { account: String, email, [ctx] }
  * @return {Promise}
  */
-module.exports = function predefined({ params }) {
+function predefined({ params }) {
   return this
     .getTransport(params.account)
     .then(transport => sendMail(transport, params.email, params.ctx));
-};
+}
+
+module.exports = predefined;
+predefined.transports = [ActionTransport.amqp];

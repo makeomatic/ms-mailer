@@ -19,23 +19,36 @@ exports.router = {
   routes: {
     directory: path.join(__dirname, '../actions'),
     prefix: 'mailer',
-    setTransportsAsDefault: true,
-    transports: [ActionTransport.amqp],
+    setTransportsAsDefault: false,
+    transports: [ActionTransport.amqp, ActionTransport.http],
+    enabledGenericActions: ['health'],
   },
   extensions: {
     enabled: ['postRequest', 'preRequest', 'preResponse'],
     register: [
       routerExtension('validate/schemaLessAction'),
-      routerExtension('audit/log'),
+      routerExtension('audit/log')(),
     ],
   },
 };
+
+exports.http = {
+  server: {
+    handler: 'hapi',
+    port: 3000,
+  },
+  router: {
+    enabled: true,
+    prefix: 'mailer',
+  },
+};
+
 
 // https://www.npmjs.com/package/html-to-text
 exports.htmlToText = {
   wordwrap: 140,
 };
 
-exports.plugins = ['validator', 'logger', 'router', 'amqp'];
+exports.plugins = ['validator', 'logger', 'router', 'amqp', 'http', 'prometheus'];
 
 exports.validator = ['../schemas'];
