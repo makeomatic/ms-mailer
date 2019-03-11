@@ -57,12 +57,13 @@
     "smtp-server": "^3.4.7"
   },
   "dependencies": {
-    "@microfleet/core": "^13.4.1",
+    "@microfleet/core": "^13.6.0",
     "@microfleet/transport-amqp": "^13.1.2",
     "@microfleet/validation": "^8.1.0",
     "bluebird": "^3.5.2",
     "bunyan": "^1.8.12",
     "common-errors": "^1.0.5",
+    "hapi": "^18.1.0",
     "is": "^3.2.0",
     "lodash": "^4.17.11",
     "ms-conf": "^3.3.0",
@@ -72,6 +73,7 @@
     "nodemailer-mailgun-transport": "^1.4.0",
     "nodemailer-plugin-inline-base64": "^2.1.1",
     "nodemailer-sparkpost-transport": "^2.1.0",
+    "prom-client": "^11.2.1",
     "stdout-stream": "^1.4.1",
     "yargs": "^12.0.2"
   },
