@@ -39,7 +39,6 @@ exports.http = {
   },
   router: {
     enabled: true,
-    prefix: 'mailer',
   },
 };
 
