@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/makeomatic/ms-mailer/compare/v8.1.1...v8.2.0) (2019-03-11)
+
+
+### Features
+
+* prometheus / healthchecks support ([#40](https://github.com/makeomatic/ms-mailer/issues/40)) ([f527dfc](https://github.com/makeomatic/ms-mailer/commit/f527dfc))
+
 ## [8.1.1](https://github.com/makeomatic/ms-mailer/compare/v8.1.0...v8.1.1) (2018-12-23)
 
 
