@@ -1,3 +1,10 @@
+# [8.3.0](https://github.com/makeomatic/ms-mailer/compare/v8.2.0...v8.3.0) (2019-03-19)
+
+
+### Features
+
+* k8s support ([#41](https://github.com/makeomatic/ms-mailer/issues/41)) ([af54ff1](https://github.com/makeomatic/ms-mailer/commit/af54ff1))
+
 # [8.2.0](https://github.com/makeomatic/ms-mailer/compare/v8.1.1...v8.2.0) (2019-03-11)
 
 
