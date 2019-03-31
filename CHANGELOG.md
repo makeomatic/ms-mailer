@@ -1,3 +1,10 @@
+## [8.3.1](https://github.com/makeomatic/ms-mailer/compare/v8.3.0...v8.3.1) (2019-03-31)
+
+
+### Bug Fixes
+
+* node 10.15.3 ([77c389f](https://github.com/makeomatic/ms-mailer/commit/77c389f))
+
 # [8.3.0](https://github.com/makeomatic/ms-mailer/compare/v8.2.0...v8.3.0) (2019-03-19)
 
 
