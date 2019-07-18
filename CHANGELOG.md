@@ -1,3 +1,10 @@
+## [8.3.2](https://github.com/makeomatic/ms-mailer/compare/v8.3.1...v8.3.2) (2019-07-18)
+
+
+### Bug Fixes
+
+* upgrade all deps, update node ([fad1041](https://github.com/makeomatic/ms-mailer/commit/fad1041))
+
 ## [8.3.1](https://github.com/makeomatic/ms-mailer/compare/v8.3.0...v8.3.1) (2019-03-31)
 
 
