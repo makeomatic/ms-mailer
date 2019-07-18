@@ -24,10 +24,11 @@ exports.router = {
     enabledGenericActions: ['health'],
   },
   extensions: {
-    enabled: ['postRequest', 'preRequest', 'preResponse'],
+    enabled: ['postRequest', 'preRequest', 'preResponse', 'postResponse'],
     register: [
       routerExtension('validate/schemaLessAction'),
       routerExtension('audit/log')(),
+      routerExtension('audit/metrics')(),
     ],
   },
 };
