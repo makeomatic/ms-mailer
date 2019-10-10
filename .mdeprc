@@ -1,5 +1,5 @@
 {
-  "node": "10.16.0",
+  "node": "10.16.3",
   "auto_compose": true,
   "services": [
     "rabbitmq"

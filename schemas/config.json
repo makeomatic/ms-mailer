@@ -17,7 +17,7 @@
           "properties": {
             "neck": {
               "type": "integer",
-              "min": 0
+              "minimum": 0
             }
           }
         },

@@ -2,7 +2,7 @@
 
 /* eslint-disable no-console */
 
-const argv = require('yargs')
+const { argv } = require('yargs')
   .option('account', {
     describe: 'account to send this email from',
     demandOption: true,
@@ -40,7 +40,7 @@ const argv = require('yargs')
   .option('attachment', {
     describe: 'attachment',
     array: true,
-    coerce: collection => collection.map((arg) => {
+    coerce: (collection) => collection.map((arg) => {
       let resp;
       try {
         resp = JSON.parse(Buffer.from(arg, 'base64'));
@@ -50,8 +50,7 @@ const argv = require('yargs')
       return resp;
     }),
   })
-  .help('h')
-  .argv;
+  .help('h');
 
 // these are basic options that we want to send
 const Promise = require('bluebird');
@@ -62,10 +61,10 @@ const config = require('../lib/config').get('/', { env: process.env.NODE_ENV });
 // App level code
 
 const amqpConfig = omit(config.amqp.transport, ['queue', 'listen', 'neck', 'onComplete', 'bindPersistantQueueToHeadersExchange']);
-const prefix = config.router.routes.prefix;
+const { prefix } = config.router.routes;
 const getTransport = () => {
   console.info('establishing connection to amqp with %j', amqpConfig);
-  return AMQPTransport.connect(amqpConfig).disposer(amqp => amqp.close());
+  return AMQPTransport.connect(amqpConfig).disposer((amqp) => amqp.close());
 };
 
 // sends email
@@ -74,7 +73,7 @@ const sendEmail = (amqp) => {
   const basics = pick(argv, ['from', 'to', 'cc', 'bcc', 'subject']);
   const message = {
     account: argv.account,
-    email: Object.assign({}, basics),
+    email: { ...basics },
   };
 
   message.email[argv.type] = argv.body;
@@ -86,7 +85,7 @@ const sendEmail = (amqp) => {
 
   return amqp
     .publishAndWait(route, message, { timeout: 60000 })
-    .tap(rsp => console.log(rsp.response));
+    .tap((rsp) => console.log(rsp.response));
 };
 
 Promise

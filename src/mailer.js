@@ -14,13 +14,7 @@ const conf = require('./config');
 /**
  * @class Mailer
  */
-module.exports = class Mailer extends Microfleet {
-  /**
-   * Default options that are merged into core
-   * @type {Object}
-   */
-  static defaultOpts = conf.get('/', { env: process.env.NODE_ENV });
-
+class Mailer extends Microfleet {
   /**
    * Updates default options and sets up predefined accounts
    * @param  {Object} opts
@@ -39,13 +33,12 @@ module.exports = class Mailer extends Microfleet {
 
     // before transport is initialized - we should open connections
     this.addConnector(ConnectorsTypes.essential, () => (
-      Promise.each(accountNames, (accountKey) => {
+      Promise.each(accountNames, async (accountKey) => {
         const account = accounts[accountKey];
-        return this.initTransport(account, limits).then((transport) => {
-          transports.set(accountKey, transport);
-          this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
-          return transport;
-        });
+        const transport = await this.initTransport(account, limits);
+        transports.set(accountKey, transport);
+        this.log.info({ namespace: 'accounts' }, 'created transport %s', accountKey);
+        return transport;
       })
     ));
 
@@ -62,13 +55,13 @@ module.exports = class Mailer extends Microfleet {
    * @param  {String} accountName [description]
    * @return {Promise}
    */
-  getTransport(accountName) {
+  async getTransport(accountName) {
     const transport = this._transports.get(accountName);
     if (transport) {
-      return Promise.resolve(transport);
+      return transport;
     }
 
-    return Promise.reject(new Errors.NotFoundError(`can't find transport for "${accountName}"`));
+    throw new Errors.NotFoundError(`can't find transport for "${accountName}"`);
   }
 
   /**
@@ -76,9 +69,9 @@ module.exports = class Mailer extends Microfleet {
    * @return {Disposer}
    */
   initDisposableTransport(...args) {
-    return this
-      .initTransport(...args)
-      .disposer(transport => transport.close());
+    return Promise
+      .resolve(this.initTransport(...args))
+      .disposer((transport) => transport.close());
   }
 
   /**
@@ -87,7 +80,7 @@ module.exports = class Mailer extends Microfleet {
    * @param  {Object} opts
    * @return {Promise}
    */
-  initTransport(credentials, _opts) {
+  async initTransport(credentials, _opts) {
     const opts = defaults(_opts, {
       pool: true,
       rateLimit: 5,
@@ -99,10 +92,12 @@ module.exports = class Mailer extends Microfleet {
       .then((input) => {
         // return either the same settings or transport wrapper
         const transport = input.transport
-          ? require(`nodemailer-${input.transport}-transport`) // eslint-disable-line global-require
+          ? require(require.resolve(`nodemailer-${input.transport}-transport`))
           : identity;
 
-        const finalOpts = Object.assign({ logger: true, debug: true }, input, opts);
+        const finalOpts = {
+          logger: true, debug: true, ...input, ...opts,
+        };
 
         // has different format
         const { dkim } = input;
@@ -133,4 +128,12 @@ module.exports = class Mailer extends Microfleet {
     this._transports.delete(name);
     this.log.debug('removed transport %s', name);
   }
-};
+}
+
+/**
+ * Default options that are merged into core
+ * @type {Object}
+ */
+Mailer.defaultOpts = conf.get('/', { env: process.env.NODE_ENV });
+
+module.exports = Mailer;

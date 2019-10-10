@@ -3,7 +3,7 @@ const testError = require('../utils/testError');
 
 // quick way to check if action is adhoc
 const adhocregex = /\.adhoc$/;
-const isAdHoc = actionName => adhocregex.test(actionName);
+const isAdHoc = (actionName) => adhocregex.test(actionName);
 
 /**
  * AMQP Plugin Configuration.

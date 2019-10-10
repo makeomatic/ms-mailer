@@ -8,16 +8,15 @@ const render = require('ms-mailer-templates');
  * @param  {Object} email
  * @return {Promise}
  */
-module.exports = function sendMail(transport, email, ctx) {
-  const template = is.string(email)
-    ? Promise.props({
+module.exports = async function sendMail(transport, email, ctx) {
+  const renderedTemplate = is.string(email)
+    ? await Promise.props({
       ...ctx.nodemailer,
       html: render(email, ctx.template),
     })
-    : Promise.resolve(email);
+    : email;
 
-  return template
-    .then(renderedTemplate => Promise.fromNode((next) => {
-      transport.sendMail(renderedTemplate, next);
-    }));
+  return Promise.fromNode((next) => {
+    transport.sendMail(renderedTemplate, next);
+  });
 };

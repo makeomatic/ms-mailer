@@ -10,7 +10,7 @@ const sendMail = require('../utils/sendMail');
  */
 function adhoc({ params }) {
   const disposableConnection = this.initDisposableTransport(params.account, { pool: false });
-  return Promise.using(disposableConnection, transport => (
+  return Promise.using(disposableConnection, (transport) => (
     sendMail(transport, params.email, params.ctx)
   ));
 }

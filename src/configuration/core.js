@@ -52,4 +52,6 @@ exports.htmlToText = {
 
 exports.plugins = ['validator', 'logger', 'router', 'amqp', 'http', 'prometheus'];
 
-exports.validator = ['../schemas'];
+exports.validator = {
+  schemas: [path.resolve(__dirname, '../../schemas')],
+};

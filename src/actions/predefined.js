@@ -6,10 +6,9 @@ const sendMail = require('../utils/sendMail');
  * @param  {Mixed} params { account: String, email, [ctx] }
  * @return {Promise}
  */
-function predefined({ params }) {
-  return this
-    .getTransport(params.account)
-    .then(transport => sendMail(transport, params.email, params.ctx));
+async function predefined({ params }) {
+  const transport = await this.getTransport(params.account);
+  return sendMail(transport, params.email, params.ctx);
 }
 
 module.exports = predefined;
