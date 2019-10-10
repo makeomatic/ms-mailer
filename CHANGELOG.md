@@ -1,3 +1,16 @@
+# [9.0.0](https://github.com/makeomatic/ms-mailer/compare/v8.3.2...v9.0.0) (2019-10-10)
+
+
+### Bug Fixes
+
+* upgrade all deps ([2a18c0d](https://github.com/makeomatic/ms-mailer/commit/2a18c0d4c59b4e4a8e639ed67fa04f0e6605b2e8))
+
+
+### BREAKING CHANGES
+
+* includes multiple upgrades to dependencies that
+contain breaking changes
+
 ## [8.3.2](https://github.com/makeomatic/ms-mailer/compare/v8.3.1...v8.3.2) (2019-07-18)
 
 
