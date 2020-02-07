@@ -1,5 +1,5 @@
 const { ActionTransport } = require('@microfleet/core');
-const sendMail = require('../utils/sendMail');
+const sendMail = require('../utils/send-mail');
 
 /**
  * Sends message via a predefined account

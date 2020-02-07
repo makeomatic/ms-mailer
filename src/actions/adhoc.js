@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const { ActionTransport } = require('@microfleet/core');
 
-const sendMail = require('../utils/sendMail');
+const sendMail = require('../utils/send-mail');
 
 /**
  * Sends message via passed auth params for the account

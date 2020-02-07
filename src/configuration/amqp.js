@@ -1,5 +1,5 @@
 const { ValidationError, NotFoundError } = require('common-errors');
-const testError = require('../utils/testError');
+const testError = require('../utils/test-error');
 
 // quick way to check if action is adhoc
 const adhocregex = /\.adhoc$/;
@@ -14,6 +14,7 @@ exports.amqp = {
     queue: 'ms-mailer',
     neck: 100,
     bindPersistantQueueToHeadersExchange: true,
+    debug: false,
   },
   router: {
     enabled: true,

@@ -14,14 +14,13 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
   describe('various mailer configurations', function configSuite() {
     let mailer;
 
-    it('successfully starts mailer', function test() {
+    it('successfully starts mailer', async function test() {
       mailer = new Mailer({ amqp: smtp.AMQPConfiguration });
-      return mailer.connect()
-        .reflect()
-        .then(inspectPromise());
+      return mailer.connect();
     });
 
     it('fails to start mailer on invalid configuration', function test() {
+      mailer = null;
       assert.throws(
         () => new Mailer({
           amqp: { ...smtp.AMQPConfiguration, prefix: false },
@@ -44,8 +43,8 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         });
     });
 
-    afterEach(function clean() {
-      return mailer && mailer.close().reflect();
+    afterEach(async function clean() {
+      return mailer && mailer.close();
     });
   });
 

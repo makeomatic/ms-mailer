@@ -1,4 +1,0 @@
---require @babel/register
---bail
---timeout 20000
--R spec
