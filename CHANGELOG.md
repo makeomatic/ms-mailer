@@ -1,3 +1,18 @@
+# [10.0.0](https://github.com/makeomatic/ms-mailer/compare/v9.0.0...v10.0.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* upgrade packages ([#43](https://github.com/makeomatic/ms-mailer/issues/43)) ([94d50c0](https://github.com/makeomatic/ms-mailer/commit/94d50c06f33fa6747b87295173037015c1a3a8a6))
+
+
+### BREAKING CHANGES
+
+* transient dependencies upgrade
+
+* chore: upgrade packages
+* fix(env): explicit node version
+
 # [9.0.0](https://github.com/makeomatic/ms-mailer/compare/v8.3.2...v9.0.0) (2019-10-10)
 
 
