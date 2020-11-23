@@ -44,7 +44,6 @@ exports.http = {
   },
 };
 
-
 // https://www.npmjs.com/package/html-to-text
 exports.htmlToText = {
   wordwrap: 140,

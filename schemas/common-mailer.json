@@ -90,19 +90,18 @@
         { "required": ["service"] },
         { "required": ["transport"] }
       ],
-      "switch": [{
-        "if": {
-          "required": ["transport"],
-          "properties": {
-            "transport": {
-              "const": "sparkpost"
-            }
+      "if": {
+        "required": ["transport"],
+        "properties": {
+          "transport": {
+            "const": "sparkpost"
           }
-        },
-        "then": {
-          "required": ["sparkPostApiKey"]
         }
-      }, {
+      },
+      "then": {
+        "required": ["sparkPostApiKey"]
+      },
+      "else": {
         "if": {
           "required": ["transport"],
           "properties": {
@@ -118,9 +117,8 @@
               "required": ["api_key", "domain"]
             }
           }
-        }
-      }, {
-        "then": {
+        },
+        "else": {
           "required": ["auth"],
           "properties": {
             "auth": {
@@ -131,7 +129,7 @@
             }
           }
         }
-      }]
+      }
     },
     "email": {
       "type": "object",
