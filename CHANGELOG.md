@@ -1,3 +1,10 @@
+# [10.1.0](https://github.com/makeomatic/ms-mailer/compare/v10.0.4...v10.1.0) (2021-02-19)
+
+
+### Features
+
+* **struc:** make sendMail method extendable ([#61](https://github.com/makeomatic/ms-mailer/issues/61)) ([9cd0d30](https://github.com/makeomatic/ms-mailer/commit/9cd0d3075310898bfafed40c5672857738a09296))
+
 ## [10.0.4](https://github.com/makeomatic/ms-mailer/compare/v10.0.3...v10.0.4) (2020-12-04)
 
 
