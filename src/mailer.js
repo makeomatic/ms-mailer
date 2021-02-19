@@ -3,12 +3,14 @@
 const { Microfleet, ConnectorsTypes } = require('@microfleet/core');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
+const is = require('is');
 const nodemailer = require('nodemailer');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const merge = require('lodash/merge');
 const defaults = require('lodash/defaults');
 const identity = require('lodash/identity');
 const { htmlToText } = require('nodemailer-html-to-text');
+const render = require('ms-mailer-templates');
 const conf = require('./config');
 
 /**
@@ -51,6 +53,26 @@ class Mailer extends Microfleet {
   }
 
   /**
+   * Promise wrapper over smtp transport
+   * @param  {Object} transport
+   * @param  {String|Object} email
+   * @param  {Object} ctx
+   * @return {Promise}
+   */
+  static async sendMail(transport, email, ctx) {
+    const renderedTemplate = is.string(email)
+      ? await Promise.props({
+        ...ctx.nodemailer,
+        html: render(email, ctx.template),
+      })
+      : email;
+
+    return Promise.fromNode((next) => {
+      transport.sendMail(renderedTemplate, next);
+    });
+  }
+
+  /**
    * Returns existing transport for the account
    * @param  {String} accountName [description]
    * @return {Promise}
@@ -77,7 +99,7 @@ class Mailer extends Microfleet {
   /**
    * Initializes transport with passed credentials
    * @param  {Object} credentials
-   * @param  {Object} opts
+   * @param  {Object} _opts
    * @return {Promise}
    */
   async initTransport(credentials, _opts) {
