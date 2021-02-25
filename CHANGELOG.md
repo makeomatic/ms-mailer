@@ -1,3 +1,10 @@
+# [10.2.0](https://github.com/makeomatic/ms-mailer/compare/v10.1.0...v10.2.0) (2021-02-25)
+
+
+### Features
+
+* **i18n:** support i18n for predefined templates' body/subject ([#62](https://github.com/makeomatic/ms-mailer/issues/62)) ([a1dac16](https://github.com/makeomatic/ms-mailer/commit/a1dac1656a306eb74406da366ad9287d9fe74b3e))
+
 # [10.1.0](https://github.com/makeomatic/ms-mailer/compare/v10.0.4...v10.1.0) (2021-02-19)
 
 
