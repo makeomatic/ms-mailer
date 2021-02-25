@@ -63,6 +63,7 @@ class Mailer extends Microfleet {
     const renderedTemplate = is.string(email)
       ? await Promise.props({
         ...ctx.nodemailer,
+        subject: ctx.nodemailer.subject && render.translate(ctx.nodemailer.subject, ctx.template),
         html: render(email, ctx.template),
       })
       : email;

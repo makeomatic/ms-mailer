@@ -76,7 +76,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to send email with inlined base64 images', function test() {
-      return render('cpst-activate', {})
+      return render('reset', {})
         .then(template => Promise.using(smtp.getAMQPConnection(), amqp => amqp
           .publishAndWait('mailer.adhoc', {
             account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
@@ -96,7 +96,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return Promise.using(smtp.getAMQPConnection(), amqp => amqp
         .publishAndWait('mailer.adhoc', {
           account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
-          email: 'cpst-activate',
+          email: 'reset',
           ctx: {
             nodemailer: {
               to: 'v@makeomatic.ru',
@@ -117,7 +117,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return Promise.using(smtp.getAMQPConnection(), amqp => amqp
         .publishAndWait('mailer.predefined', {
           account: 'test-example',
-          email: 'cpst-activate',
+          email: 'reset',
           ctx: {
             nodemailer: {
               to: 'v+retry@makeomatic.ru',
@@ -138,7 +138,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
       return Promise.using(smtp.getAMQPConnection(), amqp => amqp
         .publishAndWait('mailer.predefined', {
           account: 'test-example',
-          email: 'cpst-activate',
+          email: 'reset',
           ctx: {
             nodemailer: {
               to: 'v+retry-reject@makeomatic.ru',

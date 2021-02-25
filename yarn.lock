@@ -322,6 +322,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.12.0":
+  version "7.13.7"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.7.tgz#d494e39d198ee9ca04f4dcb76d25d9d7a1dc961a"
+  integrity sha512-h+ilqoX998mRVM5FtB5ijRuHUDVt5l3yfoOi2uh18Z/O3hvyaHQ39NpxVkCIG5yFs+mLq/ewFp8Bss6zmWv6ZA==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/runtime@^7.6.3":
   version "7.8.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.8.4.tgz#d79f5a2040f7caa24d53e563aad49cbc05581308"
@@ -4123,9 +4130,9 @@ handlebars@^4.4.0:
     uglify-js "^3.1.4"
 
 handlebars@^4.7.6:
-  version "4.7.6"
-  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.6.tgz#d4c05c1baf90e9945f77aa68a7a219aa4a7df74e"
-  integrity sha512-1f2BACcBfiwAfStCKZNrUCgqNZkGsAT7UM3kkYtXuLo0KnaVfjKOyf7PRzB6++aK9STyT1Pd2ZCPe3EGOXleXA==
+  version "4.7.7"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.7.tgz#9ce33416aad02dbd6c8fafa8240d5d98004945a1"
+  integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==
   dependencies:
     minimist "^1.2.5"
     neo-async "^2.6.0"
@@ -4380,6 +4387,18 @@ hyperid@^2.0.3:
   dependencies:
     uuid "^3.4.0"
     uuid-parse "^1.1.0"
+
+i18next-fs-backend@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/i18next-fs-backend/-/i18next-fs-backend-1.0.8.tgz#f03d911cac31d76bd6b0aa73fa9c7fc45a199e1d"
+  integrity sha512-1TyOJEGBvwqdIu0vZo/pcAxPXe/0vqOX6/hgsgTnNpcGe0PyHJ/87ABDdwdwfKJSxbtM0j6Pue0NKFcx6rOeJg==
+
+i18next@^19.8.7:
+  version "19.9.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-19.9.0.tgz#0a8cdacac4c8fb384f81f1cfcce823772b37e5d3"
+  integrity sha512-5zRG3aFl+e+LsdpVUp0dKkVhYH2iCv+gxyzXP1q2oJUc3BV26fqX87cBE3AHkMOir1X0liOaSoxS/Kg95iEcEQ==
+  dependencies:
+    "@babel/runtime" "^7.12.0"
 
 iconv-lite@0.4.24, iconv-lite@~0.4.13:
   version "0.4.24"
@@ -5886,14 +5905,16 @@ ms-conf@^7.0.2:
     lodash.uniq "^4.5.0"
     nconf "^0.10.0"
 
-ms-mailer-templates@^1.19.0:
-  version "1.19.2"
-  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-1.19.2.tgz#56ea88341fca7232e056604aefc954715d5169ff"
-  integrity sha512-wEoXuXbhP8nQQIgM3wHX4886rp4q5fv6FToWKDktuPQiDS04HmxG8g8UHdFw86OwA0HKM70SKwKZJdJkYwUQzg==
+ms-mailer-templates@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.0.0.tgz#5d5e009df9741ef3fc3088176c0118490db42be1"
+  integrity sha512-IXlxSSPYvLgdJqyTe8WecRW+mBw2IE7FS31YHPyz284pBiQvxIlW1vkfYLfNeo/JD9/jD/8+oaxjyekTC8vlEQ==
   dependencies:
     bluebird "^3.7.2"
     common-errors "^1.2.0"
     handlebars "^4.7.6"
+    i18next "^19.8.7"
+    i18next-fs-backend "^1.0.8"
 
 ms@2.0.0:
   version "2.0.0"
@@ -8695,9 +8716,9 @@ typedarray@^0.0.6:
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
 uglify-js@^3.1.4:
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.12.1.tgz#78307f539f7b9ca5557babb186ea78ad30cc0375"
-  integrity sha512-o8lHP20KjIiQe5b/67Rh68xEGRrc2SRsCuuoYclXXoC74AfSRGblU1HKzJWH3HxPZ+Ort85fWHpSX7KwBUC9CQ==
+  version "3.12.8"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.12.8.tgz#a82e6e53c9be14f7382de3d068ef1e26e7d4aaf8"
+  integrity sha512-fvBeuXOsvqjecUtF/l1dwsrrf5y2BCUk9AOJGzGcm6tE7vegku5u/YvqjyDaAGr422PLoLnrxg3EnRvTqsdC1w==
 
 uid-number@0.0.6:
   version "0.0.6"
