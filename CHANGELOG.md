@@ -1,3 +1,10 @@
+## [10.2.2](https://github.com/makeomatic/ms-mailer/compare/v10.2.1...v10.2.2) (2021-04-28)
+
+
+### Bug Fixes
+
+* updated ms-mailer-template ([#66](https://github.com/makeomatic/ms-mailer/issues/66)) ([38c59d9](https://github.com/makeomatic/ms-mailer/commit/38c59d93de2a50079c02e59ae47c47fafa3d8c3b))
+
 ## [10.2.1](https://github.com/makeomatic/ms-mailer/compare/v10.2.0...v10.2.1) (2021-04-07)
 
 
