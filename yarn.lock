@@ -323,9 +323,9 @@
     regenerator-runtime "^0.13.4"
 
 "@babel/runtime@^7.12.0":
-  version "7.14.0"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.0.tgz#46794bc20b612c5f75e62dd071e24dfd95f1cbe6"
-  integrity sha512-JELkvo/DlpNdJ7dlyw/eY7E0suy5i5GQH+Vlxaq1nsNJ+H7f4Vtv3jMeCEgRhZZQFXTjldYfQgv2qmM6M1v5wA==
+  version "7.14.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.6.tgz#535203bc0892efc7dec60bdc27b2ecf6e409062d"
+  integrity sha512-/PCB2uJ7oM44tz8YhC4Z/6PeOKXp4K588f+5M3clr1M4zbqztlo0XEfJ2LEzj/FgwfgGcIdl8n7YYjTCI0BYwg==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -5906,9 +5906,9 @@ ms-conf@^7.0.2:
     nconf "^0.10.0"
 
 ms-mailer-templates@^2.0.0:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.1.2.tgz#7678cf7e4c1b609d782fb1980f8e552e6d5a594d"
-  integrity sha512-iJwWL50PFD3B8t/3U9f27Kc7kBmMFQEdV9yIDMipTT8wGsDlUiP6HYWpsUVtgCCN3wiKo2FEcvw4tSbCOvdIiw==
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.1.3.tgz#62979b68243105894a48989bfc23129353aab212"
+  integrity sha512-/G3F57fLyLlMi3WigidfE8krhJS7AA09Yqp+LbooxwH+4MGpWOe+559xdAnURakrxtCEHmXzujvSW67z6qWvTw==
   dependencies:
     bluebird "^3.7.2"
     common-errors "^1.2.0"
@@ -8716,9 +8716,9 @@ typedarray@^0.0.6:
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
 uglify-js@^3.1.4:
-  version "3.13.9"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.13.9.tgz#4d8d21dcd497f29cfd8e9378b9df123ad025999b"
-  integrity sha512-wZbyTQ1w6Y7fHdt8sJnHfSIuWeDgk6B5rCb4E/AM6QNNPbOMIZph21PW5dRB3h7Df0GszN+t7RuUH6sWK5bF0g==
+  version "3.13.10"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.13.10.tgz#a6bd0d28d38f592c3adb6b180ea6e07e1e540a8d"
+  integrity sha512-57H3ACYFXeo1IaZ1w02sfA71wI60MGco/IQFjOqK+WtKoprh7Go2/yvd2HPtoJILO2Or84ncLccI4xoHMTSbGg==
 
 uid-number@0.0.6:
   version "0.0.6"
