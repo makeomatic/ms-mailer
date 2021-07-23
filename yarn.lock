@@ -5906,9 +5906,9 @@ ms-conf@^7.0.2:
     nconf "^0.10.0"
 
 ms-mailer-templates@^2.0.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.1.tgz#3d9ff1a5f5826c2b63c8ca0c0cade27a9e453d96"
-  integrity sha512-6vWNaKBMnUdu6+rhIWIklN9NuIeLH+tHjKOs+56unRIbV55Ccsvhp8WzReZlyIVW5ktbAbn5n/dWp+71yseT4g==
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.2.tgz#6b632ddd3d9dbfd2429cc0bed8d4c78b25c45a9e"
+  integrity sha512-oJGyrhxanwNdXka9Dgln4bS0UmaQ9fSVEysGIwR7Cnz/m+RxgaWqD3UfO/xE6vz4McWyxWjiupLraV7EMHi/uQ==
   dependencies:
     bluebird "^3.7.2"
     common-errors "^1.2.0"
