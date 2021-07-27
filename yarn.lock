@@ -5906,9 +5906,9 @@ ms-conf@^7.0.2:
     nconf "^0.10.0"
 
 ms-mailer-templates@^2.0.0:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.2.tgz#6b632ddd3d9dbfd2429cc0bed8d4c78b25c45a9e"
-  integrity sha512-oJGyrhxanwNdXka9Dgln4bS0UmaQ9fSVEysGIwR7Cnz/m+RxgaWqD3UfO/xE6vz4McWyxWjiupLraV7EMHi/uQ==
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.4.tgz#43800c8dbea53c7aac1911020a641451481818cc"
+  integrity sha512-xW4FXHtYIdmF4UmfZS5HneuP8OhK/3/ppsazqmx+l4eb1KgURIhJWM473Csy4CJr868zLQzP3T0dj6+vxTa3tg==
   dependencies:
     bluebird "^3.7.2"
     common-errors "^1.2.0"
@@ -7517,9 +7517,9 @@ regenerator-runtime@^0.13.2:
   integrity sha512-naKIZz2GQ8JWh///G7L3X6LaQUAMp2lvb1rvwwsURe/VXwD6VMfr+/1NuNw3ag8v2kY1aQ/go5SNn79O9JU7yw==
 
 regenerator-runtime@^0.13.4:
-  version "0.13.7"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.7.tgz#cac2dacc8a1ea675feaabaeb8ae833898ae46f55"
-  integrity sha512-a54FxoJDIr27pgf7IgeQGxmqUNYrcV338lf/6gH456HZ/PhX+5BcwHXG9ajESmwe6WRO0tAzRUrRmNONWgkrew==
+  version "0.13.9"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.9.tgz#8925742a98ffd90814988d7566ad30ca3b263b52"
+  integrity sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==
 
 regex-not@^1.0.0, regex-not@^1.0.2:
   version "1.0.2"
@@ -8716,9 +8716,9 @@ typedarray@^0.0.6:
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
 uglify-js@^3.1.4:
-  version "3.13.10"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.13.10.tgz#a6bd0d28d38f592c3adb6b180ea6e07e1e540a8d"
-  integrity sha512-57H3ACYFXeo1IaZ1w02sfA71wI60MGco/IQFjOqK+WtKoprh7Go2/yvd2HPtoJILO2Or84ncLccI4xoHMTSbGg==
+  version "3.14.1"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.14.1.tgz#e2cb9fe34db9cb4cf7e35d1d26dfea28e09a7d06"
+  integrity sha512-JhS3hmcVaXlp/xSo3PKY5R0JqKs5M3IV+exdLHW99qKvKivPO4Z8qbej6mte17SOPqAOVMjt/XGgWacnFSzM3g==
 
 uid-number@0.0.6:
   version "0.0.6"
