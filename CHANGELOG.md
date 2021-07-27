@@ -1,3 +1,10 @@
+## [10.2.7](https://github.com/makeomatic/ms-mailer/compare/v10.2.6...v10.2.7) (2021-07-27)
+
+
+### Bug Fixes
+
+* update version ([#77](https://github.com/makeomatic/ms-mailer/issues/77)) ([4417cba](https://github.com/makeomatic/ms-mailer/commit/4417cba29843b816b61c62f6808be1020ae3b5c8))
+
 ## [10.2.6](https://github.com/makeomatic/ms-mailer/compare/v10.2.5...v10.2.6) (2021-07-23)
 
 
