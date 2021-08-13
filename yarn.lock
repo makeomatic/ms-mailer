@@ -323,9 +323,9 @@
     regenerator-runtime "^0.13.4"
 
 "@babel/runtime@^7.12.0":
-  version "7.14.8"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.8.tgz#7119a56f421018852694290b9f9148097391b446"
-  integrity sha512-twj3L8Og5SaCRCErB4x4ajbvBIVV77CGeFglHpeg5WC5FF8TZzBWXtTJ4MqaD9QszLYTtr+IsaAL2rEUevb+eg==
+  version "7.15.3"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.15.3.tgz#2e1c2880ca118e5b2f9988322bd8a7656a32502b"
+  integrity sha512-OvwMLqNXkCXSz1kSm58sEsNuhqOx/fKpnUnKnFB5v8uDda5bLNEHNgKPvhDN6IU0LDcnHQ90LlJ0Q6jnyBSIBA==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -5906,9 +5906,9 @@ ms-conf@^7.0.2:
     nconf "^0.10.0"
 
 ms-mailer-templates@^2.0.0:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.5.tgz#5c3d174699857ecd413ef1ff302952e3168ba183"
-  integrity sha512-5jSjCJOtviORzcdOFw1sbN5a8mZgUfYDGuRaDskS1s2UdbQFxafcs+ODJgX0hzvhxzJkB7JFEYCZ3N6VEJDVZA==
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/ms-mailer-templates/-/ms-mailer-templates-2.2.6.tgz#eec3c425efef6d5f332209d37d2a28a246897686"
+  integrity sha512-FT9k3m+oM8O7supydsrjC98kLBTUeke5F6d9NzBXb7W8U3hOZpyWgSJoMJrPDNfZBIHLYmlM3kA2r8gxuKERvg==
   dependencies:
     bluebird "^3.7.2"
     common-errors "^1.2.0"
