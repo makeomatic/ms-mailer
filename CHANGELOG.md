@@ -1,3 +1,10 @@
+# [10.7.0](https://github.com/makeomatic/ms-mailer/compare/v10.6.0...v10.7.0) (2022-06-20)
+
+
+### Features
+
+* sparkpost options ([#92](https://github.com/makeomatic/ms-mailer/issues/92)) ([15e93ca](https://github.com/makeomatic/ms-mailer/commit/15e93cac26694df5d9f5ef5225c5f5efeffe6e80))
+
 # [10.6.0](https://github.com/makeomatic/ms-mailer/compare/v10.5.0...v10.6.0) (2021-11-08)
 
 
