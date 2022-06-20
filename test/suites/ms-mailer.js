@@ -43,6 +43,23 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
         });
     });
 
+    it('is able to setup transports with options', function test() {
+      mailer = new Mailer({
+        accounts: smtp.TEST_SPARKPOST_OPTIONS,
+        amqp: smtp.AMQPConfiguration,
+      });
+
+      return mailer
+        .connect()
+        .then(() => {
+          assert.equal(
+            mailer._transports.get('sparkpost').transporter.options.transactional,
+            true
+          )
+          return null;
+        });
+    });
+
     afterEach(async function clean() {
       return mailer && mailer.close();
     });
