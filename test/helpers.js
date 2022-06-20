@@ -122,6 +122,16 @@ exports.VALID_PREDEFINED_ACCOUNTS = {
   },
 };
 
+exports.TEST_SPARKPOST_OPTIONS = {
+  sparkpost: {
+    transport: 'sparkpost',
+    sparkPostApiKey: 'invalidkey',
+    options: {
+      transactional: true,
+    },
+  },
+};
+
 exports.TEST_EMAIL = {
   to: 'v@makeomatic.ru',
   html: 'very important stuff',

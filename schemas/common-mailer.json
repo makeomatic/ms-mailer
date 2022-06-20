@@ -99,7 +99,18 @@
         }
       },
       "then": {
-        "required": ["sparkPostApiKey"]
+        "required": ["sparkPostApiKey"],
+        "properties": {
+          "options": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "transactional": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
       },
       "else": {
         "if": {
