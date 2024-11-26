@@ -107,6 +107,9 @@
             "properties": {
               "transactional": {
                 "type": "boolean"
+              },
+              "return_path": {
+                "type": "string"
               }
             }
           }

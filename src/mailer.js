@@ -11,8 +11,12 @@ const defaults = require('lodash/defaults');
 const identity = require('lodash/identity');
 const { htmlToText } = require('nodemailer-html-to-text');
 const render = require('ms-mailer-templates');
+const sparkpost = require('./utils/spark-post-transport');
 const conf = require('./config');
 
+const ownTransport = {
+  sparkpost,
+};
 /**
  * @class Mailer
  */
@@ -115,7 +119,7 @@ class Mailer extends Microfleet {
       .then((input) => {
         // return either the same settings or transport wrapper
         const transport = input.transport
-          ? require(require.resolve(`nodemailer-${input.transport}-transport`))
+          ? ownTransport[input.transport] || require(require.resolve(`nodemailer-${input.transport}-transport`))
           : identity;
 
         const finalOpts = {
