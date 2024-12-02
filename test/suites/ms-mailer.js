@@ -1,7 +1,6 @@
 const Promise = require('bluebird');
 const assert = require('assert');
 const render = require('ms-mailer-templates');
-const { inspectPromise } = require('@makeomatic/deploy');
 const smtp = require('../helpers');
 
 describe('MS Mailer', function AMQPTransportTestSuite() {
@@ -55,7 +54,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           assert.equal(
             mailer._transports.get('sparkpost').transporter.options.transactional,
             true
-          )
+          );
           return null;
         });
     });
@@ -69,7 +68,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     before('start mailer', smtp.mailerStart);
 
     it('is able to send a message via predefined account', function test() {
-      return Promise.using(smtp.getAMQPConnection(), amqp => amqp
+      return Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
         .publishAndWait('mailer.predefined', {
           account: 'test-example',
           email: smtp.TEST_EMAIL,
@@ -81,7 +80,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to send a message via amqp/adhoc', function test() {
-      return Promise.using(smtp.getAMQPConnection(), amqp => amqp
+      return Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
         .publishAndWait('mailer.adhoc', {
           account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
           email: smtp.TEST_EMAIL,
@@ -94,7 +93,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
 
     it('is able to send email with inlined base64 images', function test() {
       return render('reset', {})
-        .then(template => Promise.using(smtp.getAMQPConnection(), amqp => amqp
+        .then((template) => Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
           .publishAndWait('mailer.adhoc', {
             account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
             email: {
@@ -110,7 +109,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to send email with string tpl & ctx', function test() {
-      return Promise.using(smtp.getAMQPConnection(), amqp => amqp
+      return Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
         .publishAndWait('mailer.adhoc', {
           account: smtp.VALID_PREDEFINED_ACCOUNTS['test-example'],
           email: 'reset',
@@ -131,7 +130,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('test retry with delay', function test() {
-      return Promise.using(smtp.getAMQPConnection(), amqp => amqp
+      return Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
         .publishAndWait('mailer.predefined', {
           account: 'test-example',
           email: 'reset',
@@ -152,7 +151,7 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
     });
 
     it('is able to reject on max retries', function test() {
-      return Promise.using(smtp.getAMQPConnection(), amqp => amqp
+      return Promise.using(smtp.getAMQPConnection(), (amqp) => amqp
         .publishAndWait('mailer.predefined', {
           account: 'test-example',
           email: 'reset',
@@ -167,7 +166,20 @@ describe('MS Mailer', function AMQPTransportTestSuite() {
           },
         })
         .reflect()
-        .then(inspectPromise(false))
+        .then((promise) => {
+          const isFulfilled = promise.isFulfilled();
+          const isRejected = promise.isRejected();
+          try {
+            assert.equal(isFulfilled, false);
+          } catch (e) {
+            if (isFulfilled) {
+              return Promise.reject(new Error(JSON.stringify(promise.value())));
+            }
+            throw promise.reason();
+          }
+          assert.equal(isRejected, true);
+          return promise.reason();
+        })
         .then((err) => {
           assert.equal(err.name, 'Error');
           assert.equal(err.retryAttempt, config.amqp.retry.maxRetries);

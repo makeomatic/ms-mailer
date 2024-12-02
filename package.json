@@ -5,14 +5,14 @@
   "version": "10.7.0",
   "scripts": {
     "compile": "babel -d ./lib ./src",
-    "prepublish": "yarn compile",
-    "test": "yarn lint && yarn test:e2e",
-    "test:e2e": "yarn compile && mdep test run",
+    "prepublish": "pnpm compile",
+    "test": "pnpm lint && pnpm test:e2e",
+    "test:e2e": "pnpm compile && mdep test run",
     "lint": "eslint ./src",
     "start": "mfleet",
     "semantic-release": "semantic-release",
     "docker-release": "mdep docker release",
-    "release": "yarn --frozen-lockfile && yarn semantic-release"
+    "release": "pnpm i --frozen-lockfile && pnpm semantic-release"
   },
   "keywords": [
     "microservice",
@@ -38,7 +38,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
     "@babel/plugin-transform-strict-mode": "^7.12.1",
     "@babel/register": "^7.12.1",
-    "@makeomatic/deploy": "^10.3.2",
+    "@makeomatic/deploy": "^13.1.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/exec": "^5.0.0",
     "@semantic-release/git": "^9.0.0",
@@ -53,10 +53,12 @@
     "eslint-plugin-unicorn": "^23.0.0",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
-    "smtp-server": "^3.8.0"
+    "semantic-release": "^24.2.0",
+    "smtp-server": "^3.13.6"
   },
   "dependencies": {
     "@hapi/hapi": "^20.0.2",
+    "@hapi/joi": "^17.1.1",
     "@microfleet/core": "^17.5.3",
     "@microfleet/transport-amqp": "^15.2.3",
     "@microfleet/validation": "^9.0.1",
@@ -76,15 +78,9 @@
     "yargs": "^16.1.1"
   },
   "engine": {
-    "node": ">= 12.14.0",
-    "npm": ">= 5.0.0"
+    "node": ">= 20.18.0"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS",
-      "prepare-commit-msg": "./node_modules/@makeomatic/deploy/git-hooks/prepare-commit-msg $HUSKY_GIT_PARAMS"
-    }
-  },
+  "packageManager": "pnpm@9.14.4",
   "mocha": {
     "require": [
       "@babel/register"
