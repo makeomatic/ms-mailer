@@ -1,0 +1,46 @@
+version: v1.0
+name: makeomatic/ms-mailer
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+
+fail_fast:
+  stop:
+    when: "branch != 'master'"
+
+auto_cancel:
+  running:
+    when: "branch != 'master'"
+
+global_job_config:
+  prologue:
+    commands:
+      - set -e
+      - sem-version node 20.18.0
+      - npm i -g pnpm@9.14.4
+      - checkout
+      - cache restore node-$(checksum pnpm-lock.yaml)
+      - pnpm i --frozen-lockfile --prefer-offline
+      - cache store node-$(checksum pnpm-lock.yaml) $(pnpm store path)
+
+blocks:
+  - name: test
+    dependencies: []
+    task:
+      jobs:
+        - name: test
+          commands:
+            - pnpm test
+
+  - name: release
+    dependencies: ["test"]
+    skip:
+      when: "branch != 'master'"
+    task:
+      secrets:
+        - name: semantic-release
+      jobs:
+        - name: release
+          commands:
+            - pnpm run semantic-release
