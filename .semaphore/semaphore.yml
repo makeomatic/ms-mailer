@@ -17,11 +17,12 @@ global_job_config:
   prologue:
     commands:
       - set -e
-      - sem-version node 20.18.0
-      - npm i -g pnpm@9.14.4
+      - sem-version node --lts
+      - corepack enable
+      - corepack install --global pnpm@9.x
       - checkout
       - cache restore node-$(checksum pnpm-lock.yaml)
-      - pnpm i --frozen-lockfile --prefer-offline
+      - pnpm i --frozen-lockfile --prefer-offline --ignore-scripts
       - cache store node-$(checksum pnpm-lock.yaml) $(pnpm store path)
 
 blocks:
@@ -33,13 +34,22 @@ blocks:
           commands:
             - pnpm test
 
+  - name: test-docker-build
+    dependencies: []
+    task:
+      jobs:
+      - name: docker build
+        commands:
+        - pnpm mdep docker build
+
   - name: release
-    dependencies: ["test"]
+    dependencies: ["test", "test-docker-build"]
     skip:
       when: "branch != 'master'"
     task:
       secrets:
         - name: semantic-release
+        - name: docker-hub
       jobs:
         - name: release
           commands:

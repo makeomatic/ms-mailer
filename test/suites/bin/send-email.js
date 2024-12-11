@@ -11,11 +11,12 @@ describe('binary: send-email', function suite() {
   function exec(next, args = []) {
     spawn(binaryPath, ['--account', 'test-example', ...args], {
       timeout: 20000,
-      env: Object.assign({
+      env: {
         NCONF_NAMESPACE: 'MS_MAILER',
         MS_MAILER__AMQP__TRANSPORT__CONNECTION__HOST: 'rabbitmq',
         MS_MAILER__AMQP__TRANSPORT__CONNECTION__PORT: 5672,
-      }, process.env),
+        ...process.env,
+      },
       cwd: process.cwd(),
     }, (err, stdout, stderr) => {
       if (err) {
@@ -60,7 +61,7 @@ describe('binary: send-email', function suite() {
         return next(err);
       }
 
-      assert.equal(lines[1], '250 OK: message queued');
+      assert.equal(lines[0], '250 OK: message queued');
       return next();
 
       // assert stuff
@@ -81,7 +82,7 @@ describe('binary: send-email', function suite() {
         return next(err);
       }
 
-      assert.equal(lines[1], '250 OK: message queued');
+      assert.equal(lines[0], '250 OK: message queued');
       return next();
 
       // assert stuff
@@ -106,7 +107,7 @@ describe('binary: send-email', function suite() {
         return next(err);
       }
 
-      assert.equal(lines[1], '250 OK: message queued');
+      assert.equal(lines[0], '250 OK: message queued');
       return next();
 
       // assert stuff

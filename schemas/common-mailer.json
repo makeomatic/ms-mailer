@@ -91,6 +91,7 @@
         { "required": ["transport"] }
       ],
       "if": {
+        "type": "object",
         "required": ["transport"],
         "properties": {
           "transport": {
@@ -99,6 +100,7 @@
         }
       },
       "then": {
+        "type": "object",
         "required": ["sparkPostApiKey"],
         "properties": {
           "options": {
@@ -117,6 +119,7 @@
       },
       "else": {
         "if": {
+          "type": "object",
           "required": ["transport"],
           "properties": {
             "transport": {
@@ -125,17 +128,21 @@
           }
         },
         "then": {
+          "type": "object",
           "required": ["auth"],
           "properties": {
             "auth": {
+              "type": "object",
               "required": ["api_key", "domain"]
             }
           }
         },
         "else": {
+          "type": "object",
           "required": ["auth"],
           "properties": {
             "auth": {
+              "type": "object",
               "anyOf": [
                 { "required": ["user", "pass"] },
                 { "required": ["user", "xoauth2"] }

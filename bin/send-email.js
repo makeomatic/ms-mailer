@@ -53,41 +53,48 @@ const { argv } = require('yargs')
   .help('h');
 
 // these are basic options that we want to send
-const Promise = require('bluebird');
-const AMQPTransport = require('@microfleet/transport-amqp');
+const { connect } = require('@microfleet/transport-amqp');
 const omit = require('lodash/omit');
 const pick = require('lodash/pick');
-const config = require('../lib/config').get('/', { env: process.env.NODE_ENV });
-// App level code
+const getStore = require('../lib/config');
 
-const amqpConfig = omit(config.amqp.transport, ['queue', 'listen', 'neck', 'onComplete', 'bindPersistantQueueToHeadersExchange']);
-const { prefix } = config.router.routes;
-const getTransport = () => {
-  console.info('establishing connection to amqp with %j', amqpConfig);
-  return AMQPTransport.connect(amqpConfig).disposer((amqp) => amqp.close());
-};
+async function main() {
+  const store = await getStore({ env: process.env.NODE_ENV });
+  const config = store.get('/');
 
-// sends email
-const sendEmail = (amqp) => {
-  const route = `${prefix}.predefined`;
-  const basics = pick(argv, ['from', 'to', 'cc', 'bcc', 'subject']);
-  const message = {
-    account: argv.account,
-    email: { ...basics },
-  };
+  const amqpConfig = omit(config.amqp.transport, ['queue', 'listen', 'neck', 'onComplete', 'bindPersistantQueueToHeadersExchange']);
+  const { prefix } = config.router.routes;
 
-  message.email[argv.type] = argv.body;
+  // sends email
+  async function sendEmail(amqp) {
+    const route = `${prefix}.predefined`;
+    const basics = pick(argv, ['from', 'to', 'cc', 'bcc', 'subject']);
+    const message = {
+      account: argv.account,
+      email: { ...basics },
+    };
 
-  // add attachments, ensure they are local
-  if (Array.isArray(argv.attachment) && argv.attachment.length > 0) {
-    message.email.attachments = argv.attachment;
+    message.email[argv.type] = argv.body;
+
+    // add attachments, ensure they are local
+    if (Array.isArray(argv.attachment) && argv.attachment.length > 0) {
+      message.email.attachments = argv.attachment;
+    }
+
+    const rsp = await amqp.publishAndWait(route, message, { timeout: 60000 });
+
+    console.log(rsp.response);
   }
 
-  return amqp
-    .publishAndWait(route, message, { timeout: 60000 })
-    .tap((rsp) => console.log(rsp.response));
-};
+  let transport;
+  try {
+    transport = await connect(amqpConfig);
+    await sendEmail(transport);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (transport) transport.close();
+  }
+}
 
-Promise
-  .using(getTransport(), sendEmail)
-  .done();
+main();

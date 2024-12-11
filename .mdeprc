@@ -1,7 +1,0 @@
-{
-  "node": "20.18.0",
-  "auto_compose": true,
-  "services": [
-    "rabbitmq"
-  ]
-}
