@@ -7,7 +7,7 @@ const isAdHoc = (actionName) => adhocregex.test(actionName);
 
 /**
  * AMQP Plugin Configuration.
- * @type {Object}
+ * @type {import('@microfleet/plugin-amqp').AMQPPluginConfig}
  */
 exports.amqp = {
   transport: {
@@ -16,9 +16,12 @@ exports.amqp = {
     bindPersistantQueueToHeadersExchange: true,
     debug: false,
   },
-  router: {
-    enabled: true,
-  },
+};
+
+/**
+ * @type {import('@microfleet/plugin-router-amqp/src/types/plugin').RouterAMQPPluginConfig}
+ */
+exports.routerAmqp = {
   retry: {
     enabled: true,
     factor: 1.2,

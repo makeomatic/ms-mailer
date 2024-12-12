@@ -1,1 +1,1 @@
-module.exports = require('./mailer.js');
+module.exports = exports = require('./mailer');

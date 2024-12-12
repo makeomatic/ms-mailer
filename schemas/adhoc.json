@@ -39,6 +39,7 @@
   "else": {
     "properties": {
       "email": {
+        "type": "object",
         "anyOf": [
           { "required": ["html"] },
           { "required": ["text"] }

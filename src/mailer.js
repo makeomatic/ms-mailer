@@ -3,16 +3,26 @@
 const { Microfleet, ConnectorsTypes } = require('@microfleet/core');
 const Promise = require('bluebird');
 const Errors = require('common-errors');
-const is = require('is');
 const nodemailer = require('nodemailer');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
-const merge = require('lodash/merge');
 const defaults = require('lodash/defaults');
 const identity = require('lodash/identity');
 const { htmlToText } = require('nodemailer-html-to-text');
 const render = require('ms-mailer-templates');
-const conf = require('./config');
+const deepmerge = require('@fastify/deepmerge')({
+  mergeArray(options) {
+    const { clone } = options;
+    return function replaceByClonedSource(_, source) {
+      return clone(source);
+    };
+  },
+});
+const getStore = require('./config');
+const sparkpost = require('./utils/spark-post-transport');
 
+const ownTransport = {
+  sparkpost,
+};
 /**
  * @class Mailer
  */
@@ -22,8 +32,8 @@ class Mailer extends Microfleet {
    * @param  {Object} opts
    * @return {Mailer}
    */
-  constructor(opts = {}) {
-    super(merge({}, Mailer.defaultOpts, opts));
+  constructor(opts) {
+    super(opts);
 
     const { config } = this;
 
@@ -60,7 +70,7 @@ class Mailer extends Microfleet {
    * @return {Promise}
    */
   static async sendMail(transport, email, ctx) {
-    const renderedTemplate = is.string(email)
+    const renderedTemplate = typeof email === 'string'
       ? await Promise.props({
         ...ctx.nodemailer,
         subject: ctx.nodemailer.subject && render.translate(ctx.nodemailer.subject, ctx.template),
@@ -103,7 +113,7 @@ class Mailer extends Microfleet {
    * @param  {Object} _opts
    * @return {Promise}
    */
-  async initTransport(credentials, _opts) {
+  initTransport(credentials, _opts) {
     const opts = defaults(_opts, {
       pool: true,
       rateLimit: 5,
@@ -111,34 +121,33 @@ class Mailer extends Microfleet {
       debug: this.config.debug,
     });
 
-    return this.validate('credentials', credentials)
-      .then((input) => {
-        // return either the same settings or transport wrapper
-        const transport = input.transport
-          ? require(require.resolve(`nodemailer-${input.transport}-transport`))
-          : identity;
+    const input = this.validator.ifError('credentials', credentials);
 
-        const finalOpts = {
-          logger: true, debug: true, ...input, ...opts,
-        };
+    // return either the same settings or transport wrapper
+    const transport = input.transport
+      ? ownTransport[input.transport] || require(`nodemailer-${input.transport}-transport`)
+      : identity;
 
-        // has different format
-        const { dkim } = input;
-        if (dkim) {
-          finalOpts.dkim = {
-            domainName: dkim.domain,
-            keySelector: dkim.selector,
-            privateKey: dkim.pk,
-          };
-        }
+    const finalOpts = {
+      logger: true, debug: true, ...input, ...opts,
+    };
 
-        const transporter = nodemailer.createTransport(transport(finalOpts));
+    // has different format
+    const { dkim } = input;
+    if (dkim) {
+      finalOpts.dkim = {
+        domainName: dkim.domain,
+        keySelector: dkim.selector,
+        privateKey: dkim.pk,
+      };
+    }
 
-        transporter.use('compile', inlineBase64({ cidPrefix: 'msm' }));
-        transporter.use('compile', htmlToText(this.config.htmlToText));
+    const transporter = nodemailer.createTransport(transport(finalOpts));
 
-        return transporter;
-      });
+    transporter.use('compile', inlineBase64({ cidPrefix: 'msm' }));
+    transporter.use('compile', htmlToText(this.config.htmlToText));
+
+    return transporter;
   }
 
   /**
@@ -153,10 +162,12 @@ class Mailer extends Microfleet {
   }
 }
 
-/**
- * Default options that are merged into core
- * @type {Object}
- */
-Mailer.defaultOpts = conf.get('/', { env: process.env.NODE_ENV });
+async function initMailer(override = {}) {
+  const store = await getStore({ env: process.env.NODE_ENV });
+  const users = new Mailer(deepmerge(store.get('/'), override));
+  return users;
+}
 
-module.exports = Mailer;
+exports = module.exports = initMailer;
+exports.Mailer = Mailer;
+exports.default = initMailer;

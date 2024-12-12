@@ -1,5 +1,5 @@
 const { SMTPServer } = require('smtp-server');
-const AMQPTransport = require('@microfleet/transport-amqp');
+const { connect } = require('@microfleet/transport-amqp');
 
 // basic configuration
 exports.AMQPConfiguration = {
@@ -39,14 +39,14 @@ exports.start = function startSMTPServer(done) {
       stream.on('data', () => {});
       stream.on('end', () => {
         let err;
-        if (session.envelope.rcptTo.find(it => it.address === 'v+retry@makeomatic.ru') && retryCount === 0) {
+        if (session.envelope.rcptTo.find((it) => it.address === 'v+retry@makeomatic.ru') && retryCount === 0) {
           retryCount += 1;
           err = new Error('Unexpected Server Error');
           err.responseCode = 542;
           return callback(err);
         }
 
-        if (session.envelope.rcptTo.find(it => it.address === 'v+retry-reject@makeomatic.ru') && retryCount < 1000) {
+        if (session.envelope.rcptTo.find((it) => it.address === 'v+retry-reject@makeomatic.ru') && retryCount < 1000) {
           retryCount += 1;
           err = new Error('Unexpected Server Error');
           err.responseCode = 542;
@@ -65,10 +65,10 @@ exports.stop = function stopSMTPServer(done) {
   this.server.close(done);
 };
 
-exports.mailerStart = function startMailerService() {
-  const Mailer = require('../src');
+exports.mailerStart = async function startMailerService() {
+  const initMailer = require('../src');
 
-  this.mailer = new Mailer({
+  this.mailer = await initMailer({
     logger: {
       defaultLogger: true,
       debug: true,
@@ -82,6 +82,7 @@ exports.mailerStart = function startMailerService() {
       },
     },
   });
+
   return this.mailer.connect();
 };
 
@@ -92,9 +93,7 @@ exports.mailerStop = function stopMailerService() {
 };
 
 exports.getAMQPConnection = () => (
-  AMQPTransport
-    .connect({ ...exports.AMQPConfiguration.transport, name: 'publisher' })
-    .disposer(amqp => amqp.close())
+  connect({ ...exports.AMQPConfiguration.transport, name: 'publisher' })
 );
 
 exports.VALID_PREDEFINED_ACCOUNTS = {

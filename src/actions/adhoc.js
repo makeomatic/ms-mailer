@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const { ActionTransport } = require('@microfleet/core');
+const { ActionTransport } = require('@microfleet/plugin-router');
 
 /**
  * Sends message via passed auth params for the account

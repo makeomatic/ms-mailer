@@ -1,4 +1,4 @@
-const { ActionTransport, routerExtension } = require('@microfleet/core');
+const { Extensions } = require('@microfleet/plugin-router');
 const path = require('path');
 
 exports.name = 'mailer';
@@ -15,33 +15,30 @@ exports.predefinedLimits = {
   maxMessages: Number.MAX_SAFE_INTEGER,
 };
 
+/**
+ * @type {import('@microfleet/plugin-router').RouterPluginConfig}
+ */
 exports.router = {
   routes: {
     directory: path.join(__dirname, '../actions'),
     prefix: 'mailer',
-    setTransportsAsDefault: false,
-    transports: [ActionTransport.amqp, ActionTransport.http],
     enabledGenericActions: ['health'],
   },
   extensions: {
-    enabled: ['postRequest', 'preRequest', 'preResponse', 'postResponse'],
     register: [
-      routerExtension('validate/schemaLessAction'),
-      routerExtension('audit/log')(),
-      routerExtension('audit/metrics')(),
+      Extensions.auditLog(),
     ],
   },
 };
 
-exports.http = {
+exports.hapi = {
   server: {
-    handler: 'hapi',
     port: 3000,
   },
-  router: {
-    enabled: true,
-    prefix: '',
-  },
+};
+
+exports.routerHapi = {
+  prefix: '',
 };
 
 // https://www.npmjs.com/package/html-to-text
@@ -49,7 +46,16 @@ exports.htmlToText = {
   wordwrap: 140,
 };
 
-exports.plugins = ['validator', 'logger', 'router', 'amqp', 'http', 'prometheus'];
+exports.plugins = [
+  'validator',
+  'logger',
+  'router',
+  'amqp',
+  'router-amqp',
+  'hapi',
+  'router-hapi',
+  'prometheus',
+];
 
 exports.validator = {
   schemas: [path.resolve(__dirname, '../../schemas')],
