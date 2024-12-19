@@ -53,4 +53,5 @@ blocks:
       jobs:
         - name: release
           commands:
+            - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
             - pnpm run semantic-release
