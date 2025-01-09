@@ -2,7 +2,7 @@
   "name": "ms-mailer",
   "description": "microservice mailer, incorporates nodemailer functionality with a number of useful plugins over smtp pool transport and amqp messageing layer",
   "main": "./lib/index.js",
-  "version": "10.7.0",
+  "version": "11.0.0",
   "scripts": {
     "compile": "babel -d ./lib ./src",
     "prepublish": "pnpm compile",
@@ -94,5 +94,6 @@
     "bail": true,
     "timeout": 20000,
     "reporter": "spec"
-  }
+  },
+  "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a"
 }

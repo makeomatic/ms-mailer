@@ -1,3 +1,20 @@
+# [11.0.0](https://github.com/makeomatic/ms-mailer/compare/v10.7.0...v11.0.0) (2025-01-09)
+
+
+### Bug Fixes
+
+* semaphore docker login ([287984e](https://github.com/makeomatic/ms-mailer/commit/287984e278cd563d5134b3a2bfe8a984f6cd8767))
+
+
+### Features
+
+* internalize sparkpost code, upgrade all dependencies ([#97](https://github.com/makeomatic/ms-mailer/issues/97)) ([2ee25cd](https://github.com/makeomatic/ms-mailer/commit/2ee25cd1a3498d702fe5dc1fbd5b1b2a62309a4f))
+
+
+### BREAKING CHANGES
+
+* uses latest microfleet version, which requires a change in configuration
+
 # [10.7.0](https://github.com/makeomatic/ms-mailer/compare/v10.6.0...v10.7.0) (2022-06-20)
 
 
