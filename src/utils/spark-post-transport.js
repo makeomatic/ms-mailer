@@ -128,8 +128,6 @@ function populateRecipients(request, msgData) {
 }
 
 SparkPostTransport.prototype.send = function send(message, callback) {
-  // eslint-disable-next-line no-console
-  console.log(message, '---LOG---: send: message');
   const { data } = message;
   const request = {
     content: {},
