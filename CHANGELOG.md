@@ -1,3 +1,10 @@
+## [11.0.1](https://github.com/makeomatic/ms-mailer/compare/v11.0.0...v11.0.1) (2025-01-31)
+
+
+### Bug Fixes
+
+* remove console.log ([#98](https://github.com/makeomatic/ms-mailer/issues/98)) ([45a0adf](https://github.com/makeomatic/ms-mailer/commit/45a0adf0c2c2427417c213bfd1b5daa700bc41c7))
+
 # [11.0.0](https://github.com/makeomatic/ms-mailer/compare/v10.7.0...v11.0.0) (2025-01-09)
 
 
